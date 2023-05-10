@@ -18,10 +18,12 @@
 	- `rabbitmqctl set_user_tags <username> administrator`
 * This sets permissions for the user
 	- `rabbitmqctl set_permissions -p “/” username ".*" ".*" ".*"`
-> … -p <vhost> <username> <conf> <write> <read>
+	- `… -p <vhost> <username> <conf> <write> <read>`
 
 First  ".*" for configure permission on every entity
+
 Second ".*" for write permission on every entity
+
 Third  ".*" for read permission on every entity
 
 
