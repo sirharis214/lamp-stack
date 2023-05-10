@@ -21,11 +21,8 @@
 	- `… -p <vhost> <username> <conf> <write> <read>`
 
 First `".*"` for **configure** permission on every entity
-
 Second `".*"` for **write** permission on every entity
-
 Third `".*"` for **read** permission on every entity
-
 
 The 3 “.*” fields are reg expressions that determine pattern names that user is allowed to 
 (1) config, (2) write, and (3) read. 
