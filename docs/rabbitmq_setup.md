@@ -20,15 +20,19 @@
 	- `rabbitmqctl set_permissions -p “/” username ".*" ".*" ".*"`
 	- `… -p <vhost> <username> <conf> <write> <read>`
 
-First `".*"` for configure permission on every entity
+First `".*"` for **configure** permission on every entity
 
-Second `".*"` for write permission on every entity
+Second `".*"` for **write** permission on every entity
 
-Third `".*"` for read permission on every entity
+Third `".*"` for **read** permission on every entity
 
 
 The 3 “.*” fields are reg expressions that determine pattern names that user is allowed to 
-(1) config, (2) write, and (3) read. So, let's say you want this user to only read from these queues, you could do rabbitmqctl set_permissions -p "/" "username" "$^" "$^" "^cart-order.*"
+(1) config, (2) write, and (3) read. 
+
+So, let's say you want this user to only read from these queues, you could do:
+
+`rabbitmqctl set_permissions -p "/" "username" "$^" "$^" "^cart-order.*"`
 
 But we will create a new Queue called `lamp-stack` on the default vhost `/` and give haris permission to only that queue.
 
