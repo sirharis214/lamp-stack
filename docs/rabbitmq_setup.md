@@ -1,5 +1,23 @@
-# Common rabbitmq commands
-[helpful link](https://www.shellhacks.com/rabbitmq-list-queues-rabbitmqctl/) 
+# Setup
+
+We will create a new vhost called `dev` and a new user named `haris` with admin permisson's to create and manage Exchanges and Queues in the new vhost with name prefix `data-` 
+
+1. Create new vHost
+	- `sudo rabbitmqctl add_vhost dev`
+2. Create new admin user
+	- `rabbitmqctl add_user haris p`
+	- `rabbitmqctl set_user_tags haris administrator`
+3. Set user permissions
+	- user haris will only be able to create exchange/queues beginning with "data-"
+	- `sudo rabbitmqctl set_permissions -p dev haris "^data-.*" "^data-.*" "^data-.*"`
+4. Create exchange on new vhost
+	- `rabbitmqadmin -u haris -p p --vhost=dev declare exchange name=data-exchange type=topic`
+5. Create queue on new vhost
+	- `rabbitmqadmin -u haris -p p --vhost=dev declare queue name=data-get-data durable=true`
+6. Create binding between Exchange and Queue with binding key same as queue name
+	- `rabbitmqadmin -u haris -p p --vhost=dev declare binding source=data-exchange destination_type=queue destination=data-get-data routing_key=data-get-data`
+	
+## Common rabbitmq commands
 
 * Check rabbitmq server status
 	- `systemctl status rabbitmq-server`
@@ -35,19 +53,3 @@ First `".*"` for **configure** permission on every entity. Second `".*"` for **w
 The 3 “.*” fields are reg expressions that determine pattern names that user is allowed to 
 (1) config, (2) write, and (3) read. 
 
-We will create a new vhost called `dev` and give haris permisson to create and manage Exchanges and Queues in that vhost as long as their name begins with `data-` 
-
-* Create new vHost
-	- `sudo rabbitmqctl add_vhost dev`
-* Create new admin user
-	- `rabbitmqctl add_user haris p`
-	- `rabbitmqctl set_user_tags haris administrator`
-* Set user permissions
-	- user haris will only be able to create exchange/queues beginning with "data-"
-	- `sudo rabbitmqctl set_permissions -p dev haris "^data-.*" "^data-.*" "^data-.*"`
-* Create exchange on new vhost
-	- `rabbitmqadmin -u haris -p p --vhost=dev declare exchange name=data-exchange type=topic`
-* Create queue on new vhost
-	- `rabbitmqadmin -u haris -p p --vhost=dev declare queue name=data-get-data durable=true`
-* Create binding between Exchange and Queue with binding key same as queue name
-	- `rabbitmqadmin -u haris -p p --vhost=dev declare binding source=data-exchange destination_type=queue destination=data-get-data routing_key=data-get-data`
