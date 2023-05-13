@@ -4,7 +4,11 @@ require_once('rabbitMQLib.inc');
 
 function requestProcessor($request){
 	echo "received request !".PHP_EOL;
-	var_dump("DUMP: ".$request);
+	echo "{\n";
+	foreach($request as $key=>$value){
+		echo " $key : $value\n";
+	}
+	echo "}\n";
 	
 	if(!isset($request['type']) ){
 		return "Error: unsupported message type";
