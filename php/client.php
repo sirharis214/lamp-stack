@@ -9,10 +9,12 @@ function test(){
 
 	$request = array();
 	$request['type'] = "test";
+	$request['user'] = "haris";
+	
 	$response = $client->send_request($request);
-
 	return $response;
 }
 $data = test();
+
 ?>
 

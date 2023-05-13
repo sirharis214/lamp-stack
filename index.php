@@ -9,7 +9,7 @@ require('php/client.php')
 
 <?php 
 
-echo '<pre>'; echo($data).PHP_EOL; echo '</pre>';
+echo '<pre>'; var_dump($data); echo '</pre>';
 ?>
 </body>
 </html>
