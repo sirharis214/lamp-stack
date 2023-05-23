@@ -3,4 +3,20 @@
   --white: #ffffff;
 }
 
+body{
+  margin: 0;
+  height: 100vh;
+}
 
+main{
+  height: 100%;
+  background-color: yellow;
+}
+
+.content-base {
+  height: 100%;
+}
+
+.background-fill {
+  background-color: var(--logo-blue);
+}
