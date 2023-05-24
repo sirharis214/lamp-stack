@@ -1,13 +1,7 @@
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="icon" type="image/x-icon" href="../logos/favicon.ico">	
-		<link rel="stylesheet" href="../css/main.css">
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-	</head>
-	<!-- <?php include('import-head.php'); ?> -->
-	<title>About</title>
+<head>
+    <!-- <?php include('import-head.php'); ?> -->
+</head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">LampStack</a>
@@ -23,34 +17,47 @@
 </header>
 <div class="container-fluid">
     <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3 sidebar-sticky">
-                <ul class="nav flex-column">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+            <div class="d-flex flex-column position-sticky pt-3 sidebar-sticky">
+                <ul class="nav flex-column flex-grow-1">
                     <li class="nav-item">
-                        <a href="#" class="nav-link active" aria-current="page">
+                        <a href="#" class="nav-link text-primary" aria-current="page">
                             <i class="me-2 fa-solid fa-house"></i>
                             Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="#" class="nav-link text-primary">
                             <i class="me-2 fa-solid fa-gauge"></i>
 							Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="#" class="nav-link text-primary">
                             <i class="me-2 fa-solid fa-table-list"></i>
 							Orders
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="#" class="nav-link text-primary">
                             <i class="me-2 fa-solid fa-boxes-stacked"></i>
 							Products
                         </a>
                     </li>
                 </ul>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center link-light text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                      <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                      <strong>mdo</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser2">
+                      <li><a class="dropdown-item" href="#">New project...</a></li>
+                      <li><a class="dropdown-item" href="#">Settings</a></li>
+                      <li><a class="dropdown-item" href="#">Profile</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    </ul>
+                </div> <!-- .dropdown -->
             </div> <!-- .position-sticky pt-3 sidebar-sticky -->
         </nav>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
