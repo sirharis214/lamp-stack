@@ -8,10 +8,10 @@
 	<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
-	<a class="navbar-brand px-3 w-100" href="#">Center Heading</a>
+	<a class="navbar-brand px-3 w-100" href="#">Home</a>
 	<div class="navbar-nav">
 		<div class="nav-item text-nowrap">
-			<a class="nav-link px-3" href="#">Sign out</a>
+			<a class="nav-link px-3" href="../../php/logout.php">Sign out</a>
 		</div> <!-- .nav-item text-nowrap -->
 	</div> <!-- .navbar-nav -->
 </header>
@@ -55,7 +55,7 @@
                       <li><a class="dropdown-item" href="#">Settings</a></li>
                       <li><a class="dropdown-item" href="#">Profile</a></li>
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="#">Sign out</a></li>
+                      <li><a class="dropdown-item" href="../../php/logout.php">Sign out</a></li>
                     </ul>
                 </div> <!-- .dropdown -->
 			</div> <!-- .position-sticky pt-3 sidebar-sticky -->
@@ -66,6 +66,17 @@
 			</div>
 			<div class="my-4 w-100" style="display: block; background-color:yellowgreen; height: 384px; width: 911px;">
 				<h3>First Section</h3>
+				
+				<?php 
+					session_start();
+					if(!empty($_SESSION['messages']) ){
+						$messages = $_SESSION['messages'];
+						foreach($messages as $msg){
+							echo "<pre>".$msg."</pre";
+						}
+						unset($_SESSION['messages']);
+					}
+				?>
 			</div>
 			<div class="my-4 w-100" style="display: block; background-color:lavender; height: 384px; width: 911px;">
 				<h3>Second Section</h3>
