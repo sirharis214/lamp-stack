@@ -1,6 +1,6 @@
 # Setup
 
-We will create a new vhost called `dev` and a new user named `haris` with admin permisson's to create and manage Exchanges and Queues in the new vhost with name prefix `data-` 
+We will create a new vhost called `dev` and a new user named `haris` with admin permisson's. User will be able to create and manage Exchanges and Queues in the new vhost with name prefix `data-`. 
 
 1. Create new vHost
 	- `sudo rabbitmqctl add_vhost dev`
@@ -15,8 +15,8 @@ We will create a new vhost called `dev` and a new user named `haris` with admin 
 5. Create queue on new vhost
 	- `rabbitmqadmin -u haris -p p --vhost=dev declare queue name=data-get-data durable=true`
 6. Create binding between Exchange and Queue with binding key same as queue name
-	- `rabbitmqadmin -u haris -p p --vhost=dev declare binding source=data-exchange destination_type=queue destination=data-get-data routing_key=data-get-data`
-	
+	- `rabbitmqadmin -u haris -p p --vhost=dev declare binding source=data-exchange destination_type=queue destination=data-get-data routing_key=data.get.data`
+
 ## Common rabbitmq commands
 
 * Check rabbitmq server status
@@ -28,18 +28,29 @@ We will create a new vhost called `dev` and a new user named `haris` with admin 
 	- `sudo service rabbitmq-server restart`
 * List vHosts
 	- `sudo rabbitmqctl list_vhosts`
+* Create new vHost
+	- `sudo rabbitmqctl add_vhost <vhost-name>`
+* Remove a vHost
+	- `sudo rabbitmqctl delete_vhost <vhost-name>`
 * List Exchanges
 	- `sudo rabbitmqctl list_exchanges`
-	- list of particular vhost: `sudo rabbitmqctl list_exchanges -p <vHost>`
+* List of exchange in particular vhost 
+	- `sudo rabbitmqctl list_exchanges -p <vhost-name>`
+* Create exchange on new vhost
+	- `rabbitmqadmin -u haris -p p --vhost=<vhost-name> declare exchange name=data-exchange type=topic`
+* Delete exchange on new vhost
+	- `rabbitmqadmin -u <user-name> -p <password> --vhost=<vhost-name> delete exchange name=<exchange-name>`
+* Delete exchange on default vhost
+	- `rabbitmqadmin delete exchange name=<exchange name>`
 * List Queues
 	- `sudo rabbitmqctl list_queues`
-	- list of particular vhost: `sudo rabbitmqctl list_queues -p <vHost>`
-* Remove a vHost
-	- `sudo rabbitmqctl delete_vhost <vhost>`
-* Remove a Exchange
-	- `rabbitmqadmin -u <username> -p <password> delete exchange --vhost=<vHost> name=<exchange name>`
+	- list of particular vhost: `sudo rabbitmqctl list_queues -p <vhost-name>`
+* Create queue on new vhost
+	- `rabbitmqadmin -u <user-name> -p <password> --vhost=<vhost-name> declare queue name=<queue-name> durable=true`
+* Create binding between Exchange and Queue with binding key same as queue name
+	- `rabbitmqadmin -u <user-name> -p <password> --vhost=<vhost-name> declare binding source=<exchange-name> destination_type=queue destination=<queue-name> routing_key=<routing.key>`
 * Remove a Queue
-	- `rabbitmqadmin -u <username> -p <password> delete queue --vhost=<vHost> name=<queue name>`
+	- `rabbitmqadmin -u <username> -p <password> delete queue --vhost=<vhost-name> name=<queue-name>`
 * New user and password
 	- `rabbitmqctl add_user <username> <password>`
 * Make user a administrator
