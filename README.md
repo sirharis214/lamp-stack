@@ -9,7 +9,7 @@ This is a sample full stack SAAS using linux apache mysql php rabbitmq.
 	- Storage: >= 25 GB
 2. Use frontend_requirements.txt to download dependencies
 	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
-3. Git configuration using [github_setup](../docs/github_setup.md)
+3. Git configuration using [github_setup](docs/github_setup.md)
 4. RabbitMQ configuration:
 	- Create new vHost called dev
 		- `sudo rabbitmqctl add_vhost dev`
