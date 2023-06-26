@@ -24,7 +24,7 @@ We will create a new vhost called `dev` and a new user named `haris` with admin 
 * Get service management and operator tasks
 	- `sudo rabbitmqctl status`
 * Enable management plugin (localhost:15672)
-	- `sudo rabbitmq-plugin enable rabbitmq_management`
+	- `sudo rabbitmq-plugins enable rabbitmq_management`
 	- `sudo service rabbitmq-server restart`
 * List vHosts
 	- `sudo rabbitmqctl list_vhosts`
