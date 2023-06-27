@@ -10,7 +10,10 @@ This is a sample full stack SAAS using linux apache mysql php rabbitmq.
 2. Use frontend_requirements.txt to download dependencies
 	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
 3. Git configuration using [github_setup](docs/github_setup.md)
-4. RabbitMQ configuration:
+4. RabbitMQ configuration: execute the script as root [rabbitmq-config.sh](./rabbitmq-config.sh) or perform the steps manually.
+	- Enable rabbitmq_management
+		- `sudo rabbitmq-plugins enable rabbitmq_management`
+		- you can visit `localhost:15672` to view rabbitmq console
 	- Create new vHost called dev
 		- `sudo rabbitmqctl add_vhost dev`
 	- Create new User called haris
