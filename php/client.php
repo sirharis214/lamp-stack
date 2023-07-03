@@ -1,9 +1,10 @@
 <?php
 # $_SERVER['DOCUMENT_ROOT'] = '/var/www/html'
-require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/rabbitMQLib.inc');
+#require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/rabbitMQLib.inc');
+require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/newRabbitmqClient.inc');
 
 session_start();
-$client = new rabbitMQClient('rabbitmq.ini', 'dev-server');
+$client = new newRabbitmqClient("rabbitmq.ini", "dev-server");
 
 function login(){
 	global $client;
