@@ -1,0 +1,7 @@
+openssh-server
+git
+php
+php-amqp
+rabbitmq-server
+aptitude
+mysql-server
