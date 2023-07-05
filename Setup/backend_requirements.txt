@@ -5,3 +5,4 @@ php-amqp
 rabbitmq-server
 aptitude
 mysql-server
+php-mysql
