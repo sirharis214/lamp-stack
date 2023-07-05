@@ -144,7 +144,7 @@ class rabbitMQClient{
 	private $response_queue = array();
 	private $exchange_type = "topic";
 
-	function __construct($machine, $server){
+	function __construct($machine, $server="dev-server"){
 		$data              = getHostInfo($machine);
 		$this->broker_host = $data[$server]["BROKER_HOST"];
 		$this->broker_port = $data[$server]["BROKER_PORT"];
@@ -225,7 +225,7 @@ class rabbitMQClient{
 			return $response;
 		}
 		catch(Exception $e){
-			die("failed to send message to exchange: ".$e->getMessage()."\n");
+			die("failed to send send_request message to exchange: ".$e->getMessage()."\n");
 		}
 
 	}
@@ -263,7 +263,7 @@ class rabbitMQClient{
 			return $exchange->publish($json_message, $this->routing_key);
 		}
 		catch(Exception $e){
-			die("failed to send message to exchange: ". $e->getMessage()."\n");
+			die("failed to send publish message to exchange: ". $e->getMessage()."\n");
 		}
 	}
 }

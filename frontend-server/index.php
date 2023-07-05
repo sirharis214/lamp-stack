@@ -1,10 +1,26 @@
-<?php require('php/client.php') ?>
+<?php 
+require('php/client.php');
+session_start();
+?>
 <html>
 <head>
     <?php include('files/sites/import-head.php'); ?>
 </head>
 <body class="text-center">
 <div class="container overflow-hidden">
+	<?php 
+		if(!empty($_SESSION['messages']) ){
+			foreach($_SESSION['messages'] as $msg){
+				echo <<<EOL
+					<div class='alert alert-primary alert-dismissible fade show' role='alert'>
+						$msg
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+					EOL;
+			}
+			unset($_SESSION['messages']);
+		}
+	?>
 	<img class="mb-4" src="files/logos/logo.svg" alt="" width="150" height="125">
 	<div class="row form-signin w-100 mt-2 m-auto justify-content-md-center">
   		<div class="col" align="center">
@@ -33,15 +49,5 @@
 </div><!--.container-->
 
 <?php include('files/sites/import-scripts.php'); ?>
-<?php 
-session_start();
-if(!empty($_SESSION['messages']) ){
-	$messages = $_SESSION['messages'];
-	foreach($messages as $msg){
-		echo "<pre>".$msg."</pre";
-	}
-	unset($_SESSION['messages']);
-}
-?>
 </body>
 </html>
