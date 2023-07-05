@@ -1,5 +1,6 @@
 <?php 
-require('php/client.php') 
+require('php/client.php');
+session_start();
 ?>
 <html>
 <head>
@@ -48,15 +49,5 @@ require('php/client.php')
 </div><!--.container-->
 
 <?php include('files/sites/import-scripts.php'); ?>
-<?php 
-session_start();
-if(!empty($_SESSION['messages']) ){
-	$messages = $_SESSION['messages'];
-	foreach($messages as $msg){
-		echo "<pre>".$msg."</pre";
-	}
-	unset($_SESSION['messages']);
-}
-?>
 </body>
 </html>
