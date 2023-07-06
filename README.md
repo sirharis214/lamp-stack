@@ -40,7 +40,7 @@ Use VM1 to configure frontend-server.
 ### Step 2
 Use VM2 to configure rabbitmq-server.
 * Run this script as root:
-	- [rabbitmq-configure.sh](./Setup/rabbitmq-configure.sh)
+	- [rabbitmq-config.sh](./Setup/rabbitmq-config.sh)
 		- Creates vhost
 		- Creates new rabbitmq admin user
 		- Creates Exchange, Queue and binds them
@@ -57,7 +57,29 @@ Use VM3 to configure backend-server.
 		- Creates new mysql admin user
 		- Creates `Users` table
 
-# Running the project on a single VM
+# Running the project on 2 VM's
+VM1 will serve as the web server. VM2 will serve as rabbitmq-server and backend-server.
+
+## VM1
+Follow [Step 1](#step-1) of Setup
+
+## VM2 
+* Download backend server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
+	- `xargs -a backend_requirements.txt sudo apt-get install -y`
+* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git).
+* Now, run these scripts as root:
+	- [rabbitmq-config.sh](./Setup/rabbitmq-config.sh)
+		- Creates vhost
+		- Creates new admin rabbitmq user
+		- Creates Exchange, Queue and binds them
+	- [mysql-config.sh](./Setup/mysql-config.sh)
+		- Creates `dev_db` database
+		- Creates new admin mysql user
+		- Creates `Users` table
+* run [rabbitmqServer.php](./backend-server/rabbitmqServer.php)
+
+# Running the project on 1 VM
 * Download [these](./Setup/single_server_requirements.txt) dependencies
 	- `xargs -a single_server_requirements.txt sudo apt-get install -y`
 * Configure Git using [this](./Setup/docs/github_setup.md) guide.
@@ -74,27 +96,6 @@ Use VM3 to configure backend-server.
 * Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
 * restart apache2
 	- `sudo systemctl restart apache2.service`
-* run [rabbitmqServer.php](./backend-server/rabbitmq/rabbitmqServer.php) 
+* run [rabbitmqServer.php](./backend-server/rabbitmqServer.php) 
 
-# Running the project on 2 VM's
-VM1 will serve as the web server. VM2 will serve as rabbitmq-server and backend-server.
-
-## VM1
-Follow [Step 1](#step-1) of Setup
-
-## VM2 
-* Download backend server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
-	- `xargs -a backend_requirements.txt sudo apt-get install -y`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
-* Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git).
-* Now, run these scripts as root:
-	- [rabbitmq-configure.sh](./Setup/rabbitmq-configure.sh)
-		- Creates vhost
-		- Creates new admin rabbitmq user
-		- Creates Exchange, Queue and binds them
-	- [mysql-config.sh](./Setup/mysql-config.sh)
-		- Creates `dev_db` database
-		- Creates new admin mysql user
-		- Creates `Users` table
-* run [rabbitmqServer.php](./backend-server/rabbitmq/rabbitmqServer.php)
 
