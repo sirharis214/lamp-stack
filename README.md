@@ -96,3 +96,4 @@ Follow [Step 2](#step-2) of Setup > Create Vms with the exception of the followi
 		- Creates `Users` table
 * Update [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
 * run [rabbitmq-server](./html/rabbitmq/rabbitmq-server.php) 
+
