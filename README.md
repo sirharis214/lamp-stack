@@ -56,6 +56,10 @@ Use VM3 to configure backend-server.
 		- Creates `dev_db` database
 		- Creates new mysql admin user
 		- Creates `Users` table
+* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
+* restart apache2
+	- `sudo systemctl restart apache2.service`
+* run [rabbitmqServer.php](./backend-server/rabbitmq/rabbitmqServer.php) 
 
 # Running the project on 2 VM's
 VM1 will serve as the web server. VM2 will serve as rabbitmq-server and backend-server.
@@ -96,6 +100,4 @@ Follow [Step 1](#step-1) of Setup
 * Update RabbitMQ Client's [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) file and set the `BROKER_HOST` to localhost `127.0.0.1`
 * restart apache2
 	- `sudo systemctl restart apache2.service`
-* run [rabbitmqServer.php](./backend-server/rabbitmqServer.php) 
-
-
+* run [rabbitmqServer.php](./backend-server/rabbitmqServer.php)
