@@ -3,27 +3,6 @@
 require_once('rabbitMQLib.inc');
 require_once('db.php.inc');
 
-/*
-function login($email, $password){
-	$response = array();
-	$response["status"] = false;
-	$response["messages"] = array();
-	if(strcmp($email, "test@test.com") !==0 ){
-		array_push($response["messages"], "email: ".$email." does not exist");
-	}
-	else{
-		if(strcmp($password, "testpassword") !==0 ){
-			array_push($response["messages"], "password: ".$password." does not match");
-		}
-		else{
-			$response["status"] = true;
-			array_push($response["messages"], "Logged in email: ".$email." with password: ".$password);
-		}
-	}
-	return $response;
-}
-*/
-
 function login($email, $password){
 	$response = array();
 	$response["status"] = false;
