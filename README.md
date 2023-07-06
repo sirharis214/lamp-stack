@@ -97,4 +97,3 @@ Follow [Step 1](#step-1) of Setup
 		- Creates new admin mysql user
 		- Creates `Users` table
 * run [rabbitmqServer.php](./backend-server/rabbitmq/rabbitmqServer.php) 
-
