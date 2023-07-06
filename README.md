@@ -19,81 +19,80 @@ Also, in standalone mode, the rabbitmq management console is only available on t
 
 # Setup
 ## Create VMs
-The VM setup portion is the same for all 3 VM's.
+VM creation portion is the same for all 3 VM's. The configuration portion varies or each VM. 
 
-* Create VM using Ubuntu 22.04.2 LTS iSO
+* Create 3 VM's using Ubuntu 22.04.2 LTS iSO
 	- Memory: 3072 MB
 	- Cores: 2
 	- Storage: >= 25 GB
 > For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64
 
 ### Step 1 
-Configure rabbitmq-server. We configure rabbitmq-server VM first because we need its IP address for frontend-server's [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini).
+Use VM2 to configure rabbitmq-server. We configure the VM with rabbitmq-server first because we need its IP address for frontend-server's [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini).
 
 ### Step 2
-Configure frontend-server.
+Use VM1 to configure frontend-server.
 * Download frontend server dependencies using [frontend_requirements.txt](./Setup/frontend_requirements.txt)
 	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
-* Configure Git using [this](./Setup/docs/github_setup.md)
-* Next, clone the [lamp-stack](https://github.com/sirharis214/lamp-stack.git) repo & copy all the contents of [html](./html) into `var/www/html/`.
-* Update [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to rabbitmq-server's IP
+* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git) & copy all the contents of [frontend-server](./frontend-server) into `var/www/html/`.
+* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to rabbitmq-server's IP
 * restart apache2
 	- `sudo systemctl restart apache2.service`
 
 ### Step 3 
-Configure backend-server.
+Use VM3 to configure backend-server.
 * Download backend server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
 	- `xargs -a backend_requirements.txt sudo apt-get install -y`
-* Configure Git using [this](./Setup/docs/github_setup.md)
-* Next, clone the [lamp-stack](https://github.com/sirharis214/lamp-stack.git) repo
+* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Next, clone the [lamp-stack](https://github.com/sirharis214/lamp-stack.git) repo, no need to relocate the files.
 * Now, run the scripts as root:
-	- [mysql-configure.sh](./Setup/mysql-configure.sh)
+	- [mysql-config.sh](./Setup/mysql-config.sh)
 		- Creates `dev_db` database
 		- Creates new admin mysql user
 		- Creates `Users` table
-* Update [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to rabbitmq-server's IP
 
 # Running the project on a single VM
 * Download [these](./Setup/single_server_requirements.txt) dependencies
 	- `xargs -a single_server_requirements.txt sudo apt-get install -y`
-* Configure Git using [this](./Setup/docs/github_setup.md)
-* Next, clone the [lamp-stack](https://github.com/sirharis214/lamp-stack.git) repo & copy all the contents of [html](./html) into `var/www/html/`.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git) & copy all the contents of [frontend-server](./frontend-server) into `var/www/html/`.
 * Now, run these scripts as root:
 	- [rabbitmq-configure.sh](./Setup/rabbitmq-configure.sh)
 		- Creates vhost
 		- Creates new admin rabbitmq user
 		- Creates Exchange, Queue and binds them
-	- [mysql-configure.sh](./Setup/mysql-configure.sh)
+	- [mysql-config.sh](./Setup/mysql-config.sh)
 		- Creates `dev_db` database
 		- Creates new admin mysql user
 		- Creates `Users` table
-* Update [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
+* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
 * restart apache2
 	- `sudo systemctl restart apache2.service`
+* run [rabbitmqServer.php](./backend-server/rabbitmq/rabbitmqServer.php) 
 
 # Running the project on 2 VM's
 VM1 will serve as the web server. VM2 will serve as rabbitmq-server and backend-server.
 
 ## VM1
-Follow [Step 2](#step-2) of Setup > Create Vms with the exception of the following step.
-* Update [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to VM2's IP
+Follow [Step 2](#step-2) of Setup. For the steo that requires you to update rabbitmq.ini, do this instead:
+* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to VM2's IP
 * restart apache2
 	- `sudo systemctl restart apache2.service`
 
 ## VM2 
 * Download backend server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
 	- `xargs -a backend_requirements.txt sudo apt-get install -y`
-* Configure Git using [this](./Setup/docs/github_setup.md)
-* Next, clone the [lamp-stack](https://github.com/sirharis214/lamp-stack.git) repo
+* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git).
 * Now, run these scripts as root:
 	- [rabbitmq-configure.sh](./Setup/rabbitmq-configure.sh)
 		- Creates vhost
 		- Creates new admin rabbitmq user
 		- Creates Exchange, Queue and binds them
-	- [mysql-configure.sh](./Setup/mysql-configure.sh)
+	- [mysql-config.sh](./Setup/mysql-config.sh)
 		- Creates `dev_db` database
 		- Creates new admin mysql user
 		- Creates `Users` table
-* Update [rabbitmq.ini](./html/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
-* run [rabbitmq-server](./html/rabbitmq/rabbitmq-server.php) 
+* run [rabbitmqServer.php](./backend-server/rabbitmq/rabbitmqServer.php) 
 
