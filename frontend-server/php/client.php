@@ -1,7 +1,6 @@
 <?php
 # $_SERVER['DOCUMENT_ROOT'] = '/var/www/html'
-#require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/rabbitMQLib.inc');
-require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/newRabbitmqClient.inc');
+require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/rabbitmqClient.inc');
 
 session_start();
 $client = new newRabbitmqClient("rabbitmq.ini", "dev-server");
