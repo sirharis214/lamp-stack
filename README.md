@@ -27,29 +27,34 @@ VM creation portion is the same for all 3 VM's. The configuration portion varies
 	- Storage: >= 25 GB
 > For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64
 
-### Step 1 
-Use VM2 to configure rabbitmq-server. We configure the VM with rabbitmq-server first because we need its IP address for frontend-server's [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini).
-
-### Step 2
+### Step 1
 Use VM1 to configure frontend-server.
 * Download frontend server dependencies using [frontend_requirements.txt](./Setup/frontend_requirements.txt)
 	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
 * Configure Git using [this](./Setup/docs/github_setup.md) guide.
 * Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git) & copy all the contents of [frontend-server](./frontend-server) into `var/www/html/`.
-* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to rabbitmq-server's IP
+* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to VM2's(rabbitmq-server) IP
 * restart apache2
 	- `sudo systemctl restart apache2.service`
+
+### Step 2
+Use VM2 to configure rabbitmq-server.
+* Run this script as root:
+	- [rabbitmq-configure.sh](./Setup/rabbitmq-configure.sh)
+		- Creates vhost
+		- Creates new rabbitmq admin user
+		- Creates Exchange, Queue and binds them
 
 ### Step 3 
 Use VM3 to configure backend-server.
 * Download backend server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
 	- `xargs -a backend_requirements.txt sudo apt-get install -y`
 * Configure Git using [this](./Setup/docs/github_setup.md) guide.
-* Next, clone the [lamp-stack](https://github.com/sirharis214/lamp-stack.git) repo, no need to relocate the files.
-* Now, run the scripts as root:
+* Next, clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git), no need to relocate the files.
+* Now, run this script as root:
 	- [mysql-config.sh](./Setup/mysql-config.sh)
 		- Creates `dev_db` database
-		- Creates new admin mysql user
+		- Creates new mysql admin user
 		- Creates `Users` table
 
 # Running the project on a single VM
@@ -75,10 +80,7 @@ Use VM3 to configure backend-server.
 VM1 will serve as the web server. VM2 will serve as rabbitmq-server and backend-server.
 
 ## VM1
-Follow [Step 2](#step-2) of Setup. For the steo that requires you to update rabbitmq.ini, do this instead:
-* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to VM2's IP
-* restart apache2
-	- `sudo systemctl restart apache2.service`
+Follow [Step 1](#step-1) of Setup
 
 ## VM2 
 * Download backend server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
