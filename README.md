@@ -18,8 +18,8 @@ For the sake of simplicity we will be going with the standalone mode. But [here]
 Also, in standalone mode, the rabbitmq management console is only available on the rabbitmq server. This differs from cluster mode where each node(VM) that is part of the cluster can access the management console. 
 
 # Setup
-## Create VMs
-VM creation portion is the same for all 3 VM's. The configuration portion varies or each VM. 
+## Create 3 VMs
+VM creation portion is the same for any setup. The configuration portion varies. 
 
 * Create 3 VM's using Ubuntu 22.04.2 LTS iSO
 	- Memory: 3072 MB
