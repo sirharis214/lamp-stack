@@ -93,7 +93,7 @@ Follow [Step 1](#step-1) of Setup
 		- Creates `dev_db` database
 		- Creates new admin mysql user
 		- Creates `Users` table
-* Update [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) and set the `BROKER_HOST` to localhost `127.0.0.1`
+* Update RabbitMQ Client's [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) file and set the `BROKER_HOST` to localhost `127.0.0.1`
 * restart apache2
 	- `sudo systemctl restart apache2.service`
 * run [rabbitmqServer.php](./backend-server/rabbitmqServer.php) 
