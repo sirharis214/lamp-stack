@@ -1,6 +1,4 @@
-apache2
 php
 php-amqp
 php-mysql
 rabbitmq-server
-mysql-server
