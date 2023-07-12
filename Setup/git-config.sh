@@ -4,7 +4,7 @@ config_file="$HOME/.gitconfig"
 credential_file="$HOME/.git-credentials"
 user_name="sirharis214"
 user_email="hariskido214@gmail.com"
-PAT="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"
+PAT=""
 
 echo "configuring global git variables"
 git config --global user.name "${user_name}"
