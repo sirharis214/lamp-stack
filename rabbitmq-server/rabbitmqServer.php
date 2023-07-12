@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 require_once('rabbitMQLib.inc');
-require_once('db.php.inc');
+require_once('processor.php.inc');
 
 function login($email, $password){
 	$response = array();
@@ -51,7 +51,7 @@ function requestProcessor($request){
 	}
 }
 
-$server = new rabbitmqServer('rabbitmq.ini', 'backend-server');
+$server = new rabbitmqServer('rabbitmq.ini', 'rabbitmq-server');
 $server->process_requests('requestProcessor');
 exit();
 
