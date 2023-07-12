@@ -29,6 +29,5 @@ if [ ! -f "$credential_file" ]; then
     touch "$credential_file"
 fi
 
-touch "$credential_file"
 echo "https://${user_name}:${PAT}@github.com" > $credential_file
 echo "${credentials_file} created and configured"
