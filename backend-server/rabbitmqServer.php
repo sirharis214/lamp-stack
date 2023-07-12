@@ -51,7 +51,7 @@ function requestProcessor($request){
 	}
 }
 
-$server = new rabbitMQServer('rabbitmq.ini', 'backend-server');
+$server = new rabbitmqServer('rabbitmq.ini', 'backend-server');
 $server->process_requests('requestProcessor');
 exit();
 

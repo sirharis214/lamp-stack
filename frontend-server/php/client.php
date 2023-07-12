@@ -3,8 +3,8 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/rabbitmq/rabbitMQLib.inc');
 
 session_start();
-$client = new rabbitmqClient("rabbitmq.ini", "dev-server");
-$client2 = new rabbitmqClient("rabbitmq.ini", "backend-server");
+$client = new rabbitmqClient("rabbitmq.ini", "rabbitmq-server"); // $ini_file, $server
+$client2 = new rabbitmqClient("rabbitmq.ini", "backend-server"); // $ini_file, $server
 
 function login(){
 	global $client;
