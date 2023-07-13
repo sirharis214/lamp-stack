@@ -1,5 +1,5 @@
 # Creating a RabbitMQ Cluster
-Start by downloading `rabbitmq-server` on each VM. Once all VM's are on the same rabbitmq cluster, We will configure rabbitmq from the rabbitmq-server VM. All other VM's will have access to the rabbitmq management console.
+Start by downloading `rabbitmq-server` on each VM. Once all VM's are on the same rabbitmq cluster, We will configure rabbitmq from the rabbitmq-server VM.
 
 # VM Hostnames
 1. frontend-server
