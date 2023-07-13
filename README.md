@@ -16,8 +16,7 @@ VM creation portion is the same for any setup. The configuration portion varies.
 	- Memory: 3072 MB
 	- Cores: 2
 	- Storage: >= 25 GB
-> For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64
-[Here](./Setup/docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
+> For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64. [Here](./Setup/docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
 
 ### Step 1
 Use VM1 to configure frontend-server. The web application will be hosted on this VM and it will utilize rabbitmq client to send requests. rabbitmq client will send requests over the exchange with 1 of 2 routing key's. Each routing key points to its own Queue. Each of the 2 Queues are listened to from VM2 and VM3, respectively. 
