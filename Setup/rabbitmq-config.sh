@@ -18,7 +18,7 @@ exchange_type="direct"
 rabbitmq_queue_name="${prefix}-rabbitmq"
 rabbitmq_routing_key="${prefix}.rabbitmq"
 
-backend_queue_name="${prefix}backend"
+backend_queue_name="${prefix}-backend"
 backend_routing_key="${prefix}.backend"
 
 echo "enabling rabbitmq_management, required to create exchanges and queues"
