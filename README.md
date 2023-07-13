@@ -1,5 +1,7 @@
 # lamp-stack
-This is a sample full stack SAAS using linux apache mysql php rabbitmq.
+This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. The main purpose is to demonstrate a 2 way communication between the application's frontend and backend using a message broker, RabbitMQ. 
+
+To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com/blog/part1-rabbitmq-for-beginners-what-is-rabbitmq.html) article by Lovisa Johansson who does a great job explaining the core concepts and usages of rabbitMQ.
 
 # VM's
 We will be using 3 Virtual Machines running on Ubuntu 22.04 LTS.
@@ -18,12 +20,16 @@ VM creation portion is the same for any setup. The configuration portion varies.
 	- Storage: >= 25 GB
 > For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64. [Here](./Setup/docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
 
+* It is helpful if you set static IP's for the VM's at this point.
+	- Follow [these](#setting-static-ip-on-vm) steps to set static IP's on your VM's
+
 ### Step 1
 Use VM1 to configure frontend-server. The web application will be hosted on this VM and it will utilize rabbitmq client to send requests. rabbitmq client will send requests over the exchange with 1 of 2 routing key's. Each routing key points to its own Queue. Each of the 2 Queues are listened to from VM2 and VM3, respectively. 
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide 
+	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [frontend_requirements.txt](./Setup/frontend_requirements.txt)
 	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
@@ -37,22 +43,24 @@ Use VM2 to configure rabbitmq-server. The rabbitmq service will be running on th
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide 
+	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [rabbitmq_requirements.txt](./Setup/rabbitmq_requirements.txt)
-	- `xargs -a rabbitmq_requirements sudo apt-get install -y`
+	- `xargs -a rabbitmq_requirements.txt sudo apt-get install -y`
 * Configure the rabbitmq server by running script [rabbitmq-config.sh](./Setup/rabbitmq-config.sh) as root:
 	- Creates vhost
 	- Creates new rabbitmq admin user
 	- Creates Exchange, Queues and bind them
-* Run [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php)
+* Run [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php) from the [rabbitmq-server](./rabbitmq-server) directory.
 
 ### Step 3 
 Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. We will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide 
+	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
 	- `xargs -a backend_requirements.txt sudo apt-get install -y`
@@ -60,11 +68,11 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 * Now, configure mysql database by running script [mysql-config.sh](./Setup/mysql-config.sh) as root:
 	- Creates `dev_db` database
 	- Creates new mysql admin user
-		- permissions on host: localhost and %
+		- permissions to dev_db via localhost
 	- Creates `Users` table
-* Run [rabbitmqServer.php](./backend-server/rabbitmqServer.php)
+* Run [rabbitmqServer.php](./backend-server/rabbitmqServer.php) from the [backend-server](./backend-server) directory.
 
-# Setting static IP's on VM's
+# Setting static IP on VM
 
 Its useful to set static IP's for these VM's, helps remember the IP's. Log into each VM and repeat these steps.
 
