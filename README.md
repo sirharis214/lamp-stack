@@ -3,6 +3,20 @@ This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. 
 
 To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com/blog/part1-rabbitmq-for-beginners-what-is-rabbitmq.html) article by Lovisa Johansson who does a great job explaining the core concepts and usages of rabbitMQ.
 
+The workflow begins with frontend server creating a request using rabbitmq client class, this makes the frontend-server the producer. 
+
+* request
+	- declares a temp queue which the response will be sent to
+		- `{queue-name}-response` 
+	- request sent to exchange with routing_key
+		- `data.rabbitmq`
+		- `data.backend`
+	- routing key determines which queue the request is sent to
+	
+rabbitmq server and backend server are both listening to their respected queues for any incoming requests. Requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq` and similarly requests sent with routing_key `data.backend` gets sent to the queue `data-backend`.
+
+The servers pull the requests, process them, and send the response back on the reply-queue that was sent as a parameter of the request. Once frontend server consumes the response from reply queue, the reply queue auto_deletes and the 2 way communication completes here.
+
 <image src="./Setup/docs/images/lamp_stack.png" height=40% width=80%>
 
 # VM's
