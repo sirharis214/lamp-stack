@@ -70,13 +70,18 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 Its useful to set static IP's for these VM's, helps remember the IP's. Log into each VM and repeat these steps.
 
 1. Click network settings and choose the current network
-	<image src="Setup/docs/images/18_wired_settings.png" height="60%" width="40%">
+
+<image src="Setup/docs/images/18_wired_settings.png" height="60%" width="40%">
+	
 2. Jot the DNS from the Details section.
-	<image src="Setup/docs/images/19_dns.png.png" height="60%" width="40%">
+
+<image src="Setup/docs/images/19_dns.png" height="20%" width="60%">
+
 3. Navigate to the IPv4 section & choose the manual option
 4. Fill out the fields shown in the picture, choose ip's that are easy to remember.
 	- frontend-server: `10.0.0.10`
 	- rabbitmq-server: `10.0.0.11`
 	- backend-server: `10.0.0.12`
-	<image src="Setup/docs/images/20_manual_network_settings.png" height="60%" width="40%">
+
+<image src="Setup/docs/images/20_manual_network_settings.png" height="60%" width="40%">
 
