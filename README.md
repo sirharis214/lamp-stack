@@ -1,5 +1,23 @@
 # lamp-stack
-This is a sample full stack SAAS using linux apache mysql php rabbitmq.
+This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. The main purpose is to demonstrate a 2 way communication between the application's frontend and backend using a message broker, RabbitMQ. 
+
+To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com/blog/part1-rabbitmq-for-beginners-what-is-rabbitmq.html) article by Lovisa Johansson who does a great job explaining the core concepts and usages of rabbitMQ.
+
+The workflow begins with frontend server creating a request using rabbitmq client class, this makes the frontend-server the producer. 
+
+* request
+	- declares a temp queue which the response will be sent to
+		- `{queue-name}-response` 
+	- request sent to exchange with routing_key
+		- `data.rabbitmq`
+		- `data.backend`
+	- routing key determines which queue the request is sent to
+	
+rabbitmq server and backend server are both listening to their respected queues for any incoming requests. Requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq` and similarly requests sent with routing_key `data.backend` gets sent to the queue `data-backend`.
+
+The servers pull the requests, process them, and send the response back on the reply-queue that was sent as a parameter of the request. Once frontend server consumes the response from reply queue, the reply queue auto_deletes and the 2 way communication completes here.
+
+<image src="./Setup/docs/images/lamp_stack.png" height=40% width=80%>
 
 # VM's
 We will be using 3 Virtual Machines running on Ubuntu 22.04 LTS.
@@ -16,14 +34,18 @@ VM creation portion is the same for any setup. The configuration portion varies.
 	- Memory: 3072 MB
 	- Cores: 2
 	- Storage: >= 25 GB
-> For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64
+> For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64. [Here](./Setup/docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
+
+* It is helpful if you set static IP's for the VM's at this point.
+	- Follow [these](#setting-static-ip-on-vm) steps to set static IP's on your VM's
 
 ### Step 1
 Use VM1 to configure frontend-server. The web application will be hosted on this VM and it will utilize rabbitmq client to send requests. rabbitmq client will send requests over the exchange with 1 of 2 routing key's. Each routing key points to its own Queue. Each of the 2 Queues are listened to from VM2 and VM3, respectively. 
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide 
+	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [frontend_requirements.txt](./Setup/frontend_requirements.txt)
 	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
@@ -37,22 +59,24 @@ Use VM2 to configure rabbitmq-server. The rabbitmq service will be running on th
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide 
+	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [rabbitmq_requirements.txt](./Setup/rabbitmq_requirements.txt)
-	- `xargs -a rabbitmq_requirements sudo apt-get install -y`
+	- `xargs -a rabbitmq_requirements.txt sudo apt-get install -y`
 * Configure the rabbitmq server by running script [rabbitmq-config.sh](./Setup/rabbitmq-config.sh) as root:
 	- Creates vhost
 	- Creates new rabbitmq admin user
 	- Creates Exchange, Queues and bind them
-* Run [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php)
+* Run [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php) from the [rabbitmq-server](./rabbitmq-server) directory.
 
 ### Step 3 
-Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. we will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
+Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. We will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide.
+* Configure Git using [this](./Setup/docs/github_setup.md) guide 
+	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
 	- `xargs -a backend_requirements.txt sudo apt-get install -y`
@@ -60,7 +84,27 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 * Now, configure mysql database by running script [mysql-config.sh](./Setup/mysql-config.sh) as root:
 	- Creates `dev_db` database
 	- Creates new mysql admin user
-		- permissions on host: localhost and %
+		- permissions to dev_db via localhost
 	- Creates `Users` table
-* Run [rabbitmqServer.php](./backend-server/rabbitmqServer.php)
+* Run [rabbitmqServer.php](./backend-server/rabbitmqServer.php) from the [backend-server](./backend-server) directory.
+
+# Setting static IP on VM
+
+Its useful to set static IP's for these VM's, helps remember the IP's. Log into each VM and repeat these steps.
+
+1. Click network settings and choose the current network
+
+<image src="Setup/docs/images/18_wired_settings.png" height="60%" width="40%">
+	
+2. Jot the DNS from the Details section.
+
+<image src="Setup/docs/images/19_dns.png" height="20%" width="60%">
+
+3. Navigate to the IPv4 section & choose the manual option
+4. Fill out the fields shown in the picture, choose ip's that are easy to remember.
+	- frontend-server: `10.0.0.10`
+	- rabbitmq-server: `10.0.0.11`
+	- backend-server: `10.0.0.12`
+
+<image src="Setup/docs/images/20_manual_network_settings.png" height="60%" width="40%">
 

@@ -1,4 +1,4 @@
 php
 php-amqp
-php-mysql
+openssh-server
 rabbitmq-server
