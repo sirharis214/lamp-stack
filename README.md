@@ -3,7 +3,7 @@ This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. 
 
 To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com/blog/part1-rabbitmq-for-beginners-what-is-rabbitmq.html) article by Lovisa Johansson who does a great job explaining the core concepts and usages of rabbitMQ.
 
-<image src="./Setup/docs/images/lamp_stack.svg" height=40% width=80%>
+<image src="./Setup/docs/images/lamp_stack.png" height=40% width=80%>
 
 # VM's
 We will be using 3 Virtual Machines running on Ubuntu 22.04 LTS.
