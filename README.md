@@ -17,6 +17,7 @@ VM creation portion is the same for any setup. The configuration portion varies.
 	- Cores: 2
 	- Storage: >= 25 GB
 > For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64
+[Here](./Setup/docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
 
 ### Step 1
 Use VM1 to configure frontend-server. The web application will be hosted on this VM and it will utilize rabbitmq client to send requests. rabbitmq client will send requests over the exchange with 1 of 2 routing key's. Each routing key points to its own Queue. Each of the 2 Queues are listened to from VM2 and VM3, respectively. 
@@ -48,7 +49,7 @@ Use VM2 to configure rabbitmq-server. The rabbitmq service will be running on th
 * Run [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php)
 
 ### Step 3 
-Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. we will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
+Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. We will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
@@ -63,4 +64,19 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 		- permissions on host: localhost and %
 	- Creates `Users` table
 * Run [rabbitmqServer.php](./backend-server/rabbitmqServer.php)
+
+# Setting static IP's on VM's
+
+Its useful to set static IP's for these VM's, helps remember the IP's. Log into each VM and repeat these steps.
+
+1. Click network settings and choose the current network
+	<image src="Setup/docs/images/18_wired_settings.png" height="60%" width="40%">
+2. Jot the DNS from the Details section.
+	<image src="Setup/docs/images/19_dns.png.png" height="60%" width="40%">
+3. Navigate to the IPv4 section & choose the manual option
+4. Fill out the fields shown in the picture, choose ip's that are easy to remember.
+	- frontend-server: `10.0.0.10`
+	- rabbitmq-server: `10.0.0.11`
+	- backend-server: `10.0.0.12`
+	<image src="Setup/docs/images/20_manual_network_settings.png" height="60%" width="40%">
 
