@@ -1,0 +1,4 @@
+php
+php-amqp
+openssh-server
+rabbitmq-server
