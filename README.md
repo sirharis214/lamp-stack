@@ -3,6 +3,20 @@ This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. 
 
 To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com/blog/part1-rabbitmq-for-beginners-what-is-rabbitmq.html) article by Lovisa Johansson who does a great job explaining the core concepts and usages of rabbitMQ.
 
+The workflow begins with frontend server creating a request using rabbitmq client class, this makes the frontend-server the producer. 
+
+* request
+	- declares a temp queue which the response will be sent to
+		- `{queue-name}-response` 
+	- request sent to exchange with routing_key
+		- `data.rabbitmq`
+		- `data.backend`
+	- routing key determines which queue the request is sent to
+	
+rabbitmq server and backend server are both listening to their respected queues for any incoming requests. Requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq` and similarly requests sent with routing_key `data.backend` gets sent to the queue `data-backend`.
+
+The servers pull the requests, process them, and send the response back on the reply-queue that was sent as a parameter of the request. Once frontend server consumes the response from reply queue, the reply queue auto_deletes and the 2 way communication completes here.
+
 <image src="./Setup/docs/images/lamp_stack.png" height=40% width=80%>
 
 # VM's
@@ -54,7 +68,8 @@ Use VM2 to configure rabbitmq-server. The rabbitmq service will be running on th
 	- Creates vhost
 	- Creates new rabbitmq admin user
 	- Creates Exchange, Queues and bind them
-* Run [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php) from the [rabbitmq-server](./rabbitmq-server) directory.
+* Lets create a systemd service for [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php) from the [rabbitmq-server](./rabbitmq-server) directory so rabbitmq service listens into the queue at start up.
+	- Run the script as root [rabbitmq-server-rmq-service.sh](./Setup/rabbitmq-server-rmq-service.sh)
 
 ### Step 3 
 Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. We will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
@@ -72,7 +87,8 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 	- Creates new mysql admin user
 		- permissions to dev_db via localhost
 	- Creates `Users` table
-* Run [rabbitmqServer.php](./backend-server/rabbitmqServer.php) from the [backend-server](./backend-server) directory.
+* Lets create a systemd service for [rabbitmqServer.php](./backend-server/rabbitmqServer.php) from the [backend-server](./backend-server) directory so rabbitmq service listens into the queue at start up.
+	- Run the script as root [backend-server-rmq-service.sh](./Setup/backend-server-rmq-service.sh)
 
 # Setting static IP on VM
 
