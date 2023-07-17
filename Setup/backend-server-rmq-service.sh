@@ -1,7 +1,7 @@
 #!/bin/bash
 
 root_file="/lib/systemd/system"
-service_name="backend-server.service"
+service_name="backend-service.service"
 server_file="/home/haris/Github/lamp-stack/backend-server/rabbitmqServer.php"
 
 
@@ -10,10 +10,10 @@ if [ ! -f "${root_file}/${service_name}" ]; then
     touch "${root_file}/${service_name}"
 fi
 
-echo "Adding rabbitmq-server configuration"
+echo "Adding ${service_name} configuration"
 cat << EOF > "${root_file}/${service_name}"
 [Unit]
-Description= backend-server listening on Queue data-backend
+Description= ${service_name} listening on Queue data-backend
 
 [Service]
 Type=simple
