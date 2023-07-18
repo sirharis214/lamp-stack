@@ -28,7 +28,7 @@ session_start();
   				<form action="php/client.php" method="POST">
     					<h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 					<div class="form-floating py-2">
-						<input type="email" class="form-control" id="email" name="email" placeholder="name@example.com">
+						<input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" autofocus="autofocus">
 						<label for="email">Email address</label>
 					</div>
 					<div class="form-floating py-2">
@@ -41,6 +41,8 @@ session_start();
 						</label>
 					</div>
 					<button class="w-100 btn btn-lg btn-primary" type="submit" name="login">Sign in</button>
+					<p class="mt-3"><a href="files/sites/register.php" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Signup Here</a></p>
+
 					<p class="mt-5 mb-3 text-body-secondary">&copy; 2023 - present</p>
 				</form>
   			</div><!--.card-->
