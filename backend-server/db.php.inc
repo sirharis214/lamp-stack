@@ -7,34 +7,25 @@ class User{
 	private $pass = "p";
 	public  $db   = "dev_db";
 	
-	public function __construct(){
-		try{
+	public function __construct() {
+		try {
 			$this->db_connection = new mysqli($this->host, $this->user, $this->pass, $this->db);
-		}catch(Exception $e) {
+		} catch(Exception $e) {
   			echo 'Database connection error: '.$e->getMessage().PHP_EOL;
   		}
 		//echo "Connected to database".PHP_EOL;
-		
+	}//close _construct
+	
+	public function validateLogin($email, $password) {
 		$response = array();
 		$response["status"] = false;
 		$response["messages"] = array();
 		
-		if(!$this->db_connection){
+		if (!$this->db_connection) {
 			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
 			return $response;
 		}
-	}//close _construct
-	
-	public function validateLogin($email, $password){
-		/*$response = array();
-		$response["status"] = false;
-		$response["messages"] = array();
 		
-		if(!$this->db_connection){
-			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
-			return $response;
-		}
-		*/
 		$_email = $this->db_connection->real_escape_string($email);
 		$_password = $this->db_connection->real_escape_string($password);
 		
@@ -42,67 +33,83 @@ class User{
 		$statement = "SELECT * FROM Users WHERE email='$_email' and hashed_data='$_password'";
 		$query_response = $this->db_connection->query($statement);
 			
-		if(!$query_response){
+		if (!$query_response) {
     			// Error occurred while executing the query
    			echo "Error: ".mysqli_error($db_connection).PHP_EOL;
    			array_push($response["messages"], "Error: ".mysqli_error($db_connection) );
-   		}else{
-    			if(mysqli_num_rows($query_response) > 0 ){
+   		} else {
+    			if (mysqli_num_rows($query_response) > 0 ) {
         			// Records found
         			while ($row = mysqli_fetch_assoc($query_response)) {
-           				if($row['email'] == $_email &&  $row['hashed_data'] == $_password){ 
+           				if ($row['email'] == $_email &&  $row['hashed_data'] == $_password) { 
            					echo"password matches for $_email".PHP_EOL;
 						$response["status"] = true;
 						array_push($response["messages"], "password matches for $_email");
-           				}else{
+           				} else {
 						echo "password did not match for $_email".PHP_EOL;
 						array_push($response["messages"], "incorrect password for $_email");
 					}
-        			}// while
+        			}
         			
-    			}else{
+    			} else {
         			// No records found
         			echo "No records found with the email: $_email.".PHP_EOL;
-        			array_push($response["messages"], "No records found for $_email" );
-    			} // else
-		} // else
+        			array_push($response["messages"], "No records found for $_email");
+    			}
+		}
 		
-		return $this->response;
+		return $response;
 	} // close validateLogin()
 	
 	public function registerUser($data) {
+		$tableName = 'Users';
+		$response = array();
+		$response["status"] = false;
+		$response["messages"] = array();
+		
+		if (!$this->db_connection) {
+			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			return $response;
+		}
+		
 		$_username    = $this->db_connection->real_escape_string($data['username']);
 		$_email       = $this->db_connection->real_escape_string($data['email']);
 		$_role        = $this->db_connection->real_escape_string($data['role']);
 		$_created_on  = $this->db_connection->real_escape_string($data['created_on']);
 		$_hashed_data = $this->db_connection->real_escape_string($data['hashed_data']);
-		$tableName = 'Users';
 		
 		echo "Registering user $_username".PHP_EOL;
-		// Create the SQL query
-		$sql = "INSERT INTO $tableName (username, email, role, created_on, hashed_data) VALUES (?, ?, ?, ?, ?)";
 		
-		// Prepare the statement
-		$stmt = $this->db_connection->prepare($sql);
-		
-		// Bind the parameters and execute the query
-		$stmt->bind_param("sssss", $username, $email, $role, $created_on, $hashed_data);
-		$stmt->execute();
-		
-		// Check if the insertion was successful
-		if ($stmt->affected_rows > 0) {
-			echo "Record inserted successfully.".PHP_EOL;
-			$response["status"] = true;
-			array_push($response["messages"], "Registered $_username successfully." );
-		} else {
-			echo "Error inserting record: " . $stmt->error.PHP_EOL;
-			array_push($response["messages"], "Error registering $_username: " . $stmt->error);
-		}
+		try {
+			// Create the SQL query
+			$sql = "INSERT INTO $tableName (username, email, role, created_on, hashed_data) VALUES (?, ?, ?, ?, ?)";
+			
+			// Prepare the statement
+			$stmt = $this->db_connection->prepare($sql);
+			
+			// Bind the parameters and execute the query
+			$stmt->bind_param("sssss", $_username, $_email, $_role, $_created_on, $_hashed_data);
+			$stmt->execute();
+			
+			// Check if the insertion was successful
+			if ($stmt->affected_rows > 0) {
+				echo "Record inserted successfully.".PHP_EOL;
+				$response["status"] = true;
+				array_push($response["messages"], "Registered $_username successfully.");
+			} else {
+				echo "Error inserting record: " . $stmt->error.PHP_EOL;
+				array_push($response["messages"], "Error registering $_username: " . $stmt->error);
+			}
 
-		// Close the statement and the database connection
-		$stmt->close();
-		$this->db_connection->close();
+			// Close the statement and the database connection
+			$stmt->close();
+			$this->db_connection->close();
+		} catch (Exception $e) {
+		    // Handle the exception
+		    echo "Error: " . $e->getMessage().PHP_EOL;
+		    array_push($response["messages"], "Sorry, we're experiecing a db error: ". $e->getMessage() );
+		}
 		
-		return $this->response;
+		return $response;
 	}
 } // close User class
