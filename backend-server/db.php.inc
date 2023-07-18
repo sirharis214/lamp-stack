@@ -13,11 +13,8 @@ class User{
 		}catch(Exception $e) {
   			echo 'Database connection error: '.$e->getMessage().PHP_EOL;
   		}
-
 		//echo "Connected to database".PHP_EOL;
-	}//close _construct
-	
-	public function validateLogin($email, $password){
+		
 		$response = array();
 		$response["status"] = false;
 		$response["messages"] = array();
@@ -26,7 +23,18 @@ class User{
 			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
 			return $response;
 		}
+	}//close _construct
 	
+	public function validateLogin($email, $password){
+		/*$response = array();
+		$response["status"] = false;
+		$response["messages"] = array();
+		
+		if(!$this->db_connection){
+			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			return $response;
+		}
+		*/
 		$_email = $this->db_connection->real_escape_string($email);
 		$_password = $this->db_connection->real_escape_string($password);
 		
@@ -59,6 +67,42 @@ class User{
     			} // else
 		} // else
 		
-		return $response;
+		return $this->response;
 	} // close validateLogin()
+	
+	public function registerUser($data) {
+		$_username    = $this->db_connection->real_escape_string($data['username']);
+		$_email       = $this->db_connection->real_escape_string($data['email']);
+		$_role        = $this->db_connection->real_escape_string($data['role']);
+		$_created_on  = $this->db_connection->real_escape_string($data['created_on']);
+		$_hashed_data = $this->db_connection->real_escape_string($data['hashed_data']);
+		$tableName = 'Users';
+		
+		echo "Registering user $_username".PHP_EOL;
+		// Create the SQL query
+		$sql = "INSERT INTO $tableName (username, email, role, created_on, hashed_data) VALUES (?, ?, ?, ?, ?)";
+		
+		// Prepare the statement
+		$stmt = $this->db_connection->prepare($sql);
+		
+		// Bind the parameters and execute the query
+		$stmt->bind_param("sssss", $username, $email, $role, $created_on, $hashed_data);
+		$stmt->execute();
+		
+		// Check if the insertion was successful
+		if ($stmt->affected_rows > 0) {
+			echo "Record inserted successfully.".PHP_EOL;
+			$response["status"] = true;
+			array_push($response["messages"], "Registered $_username successfully." );
+		} else {
+			echo "Error inserting record: " . $stmt->error.PHP_EOL;
+			array_push($response["messages"], "Error registering $_username: " . $stmt->error);
+		}
+
+		// Close the statement and the database connection
+		$stmt->close();
+		$this->db_connection->close();
+		
+		return $this->response;
+	}
 } // close User class

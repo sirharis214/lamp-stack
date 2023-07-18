@@ -3,6 +3,25 @@
 require_once('rabbitMQLib.inc');
 require_once('db.php.inc');
 
+function register($data) {
+	$response = array();
+	$response["status"] = false;
+	$response["messages"] = array();
+	
+	$register_user = new User();
+	$register_user_response = $register_user->registerUser($data);
+	
+	# update response messages
+	foreach($register_user_response['messages'] as $msg){
+		array_push($response['messages'], $msg);
+	}
+	# check if register was successful or not
+	if($register_user_response['status'] == true){
+		$response["status"] = true;
+	}
+	return $response;
+}
+
 function login($email, $password){
 	$response = array();
 	$response["status"] = false;
@@ -45,6 +64,8 @@ function requestProcessor($request){
 				return array("returnCode"=>"0", "message"=>"recieved type:test");
 			case "login":
 				return login($request['email'], $request['password']);
+			case "register":
+				return register($request['data']);
 		}
 	
 		return array("returnCode"=>"0", "message"=>"Server received request and processed");

@@ -8,7 +8,8 @@ session_start();
 </head>
 <body class="text-center">
 <div class="container overflow-hidden">
-	<?php 
+	<!-- server side error messages -->
+	<?php
 		if(!empty($_SESSION['messages']) ){
 			foreach($_SESSION['messages'] as $msg){
 				echo <<<EOL
@@ -21,6 +22,10 @@ session_start();
 			unset($_SESSION['messages']);
 		}
 	?>
+	<!-- client side error messages -->
+	<div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-message" style="display: none;">
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
 	<img class="mb-4" src="../logos/logo.svg" alt="" width="150" height="125">
 	<div class="row form-signin w-100 mt-2 m-auto justify-content-md-center">
   		<div class="col" align="center">
