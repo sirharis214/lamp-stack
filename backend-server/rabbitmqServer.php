@@ -22,13 +22,13 @@ function register($data) {
 	return $response;
 }
 
-function login($email, $password){
+function login($data){
 	$response = array();
 	$response["status"] = false;
 	$response["messages"] = array();
 	
 	$check_login = new User();
-	$check_login_response = $check_login->validateLogin($email, $password);
+	$check_login_response = $check_login->validateLogin($data);
 	
 	# update response messages
 	foreach($check_login_response['messages'] as $msg){
@@ -37,7 +37,6 @@ function login($email, $password){
 	# check if login was successful or not
 	if($check_login_response['status'] == true){
 		$response["status"] = true;
-		array_push($response["messages"], "Logged in email: ".$email." with password: ".$password);
 	}
 	
 	//var_dump($check_login_response);
@@ -63,7 +62,7 @@ function requestProcessor($request){
 			case "test":
 				return array("returnCode"=>"0", "message"=>"recieved type:test");
 			case "login":
-				return login($request['email'], $request['password']);
+				return login($request['data']);
 			case "register":
 				return register($request['data']);
 		}

@@ -29,9 +29,11 @@ function login2() {
 	global $backend_client;
 	$request = array();
 	$request['type'] = "login";
-	$request['email'] = $_POST['email'];
-	$request['password']= $_POST['password'];
-
+	$request['data'] = array(
+		"email" => $_POST['email'],
+		"password" => $_POST['password']
+	);
+	
 	$response = $backend_client->send_request($request);
 	return $response;
 }
@@ -47,33 +49,47 @@ function login() {
 	return $response;
 }
 
-if (isset($_POST['login']) ) {
-	$response = login();
-	$_SESSION['messages'] = $response["messages"];
-	
-	if ($response["status"]==true) {
-		header('location:../files/sites/home.php' );
-	} else if ($response["status"]==false) {
-		header('location:../index.php' );
-	}
-} else if (isset($_POST['login2']) ) {
-	$response = login2();
-	$_SESSION['messages'] = $response['messages'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action'])) {
+        $action = $_POST['action'];
 
-	if ($response['status']==true) {
-		header('location:../files/sites/home.php');
-	} else if ($response["status"]==false) {
-		header('location:../login.php');
-	}
-} else if (isset($_POST['register']) ) {
-	$response = register();
-	$_SESSION['messages'] = $response['messages'];
-
-	if ($response['status']==true) {
-		header('location:../files/sites/home.php');
-	} else if ($response["status"]==false) {
-		header('location:../login.php');
-	}
+        switch ($action) {
+            case 'login':
+                $response = login();
+			    $_SESSION['messages'] = $response["messages"];
+			    if ($response["status"]==true) {
+					header('location:../files/sites/home.php' );
+				} else if ($response["status"]==false) {
+					header('location:../index.php' );
+				}
+                break;
+            case 'login2':
+                $response = login2();
+				$_SESSION['messages'] = $response['messages'];
+				if ($response['status']==true) {
+					header('location:../files/sites/home.php');
+				} else if ($response["status"]==false) {
+					header('location:../login.php');
+				}
+                break;
+            case 'register':
+                $response = register();
+				$_SESSION['messages'] = $response['messages'];
+				if ($response['status']==true) {
+					header('location:../files/sites/home.php');
+				} else if ($response["status"]==false) {
+					header('location:../files/sites/register.php');
+				}
+                break;
+            default:
+                $_SESSION['messages'] = "Invalid action!";
+                header('location:../login.php');
+                break;
+        }
+    } else {
+    	$_SESSION['messages'] = "Action not specified!";
+        header('location:../login.php');
+    }
 }
 ?>
 

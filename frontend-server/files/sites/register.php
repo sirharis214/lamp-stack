@@ -66,6 +66,7 @@ session_start();
 						<input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Confirm Password">
 						<label for="confirm-password">Confirm Password</label>
 					</div>
+					<input type="hidden" name="action" value="register">
 					<button class="w-100 btn btn-lg btn-primary" type="submit" name="register">Signup</button>
 					<p class="mt-3"><a href="../../index.php" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Sign in Here</a></p>
 
