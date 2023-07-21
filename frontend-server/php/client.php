@@ -58,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = login();
 			    $_SESSION['messages'] = $response["messages"];
 			    if ($response["status"]==true) {
+			    	$_SESSION['authenticated'] = true;
+			    	$_SESSION['last_activity'] = time();
 					header('location:../files/sites/home.php' );
 				} else if ($response["status"]==false) {
 					header('location:../index.php' );
@@ -67,6 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = login2();
 				$_SESSION['messages'] = $response['messages'];
 				if ($response['status']==true) {
+					$_SESSION['authenticated'] = true;
+					$_SESSION['last_activity'] = time();
 					header('location:../files/sites/home.php');
 				} else if ($response["status"]==false) {
 					header('location:../login.php');
@@ -76,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = register();
 				$_SESSION['messages'] = $response['messages'];
 				if ($response['status']==true) {
-					header('location:../files/sites/home.php');
+					header('location:../login.php');
 				} else if ($response["status"]==false) {
 					header('location:../files/sites/register.php');
 				}

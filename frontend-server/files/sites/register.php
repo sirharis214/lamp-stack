@@ -4,7 +4,7 @@ session_start();
 ?>
 <html>
 <head>
-    <?php include('import-head.php'); ?>
+    <?php include('import-head.inc.php'); ?>
 </head>
 <body class="text-center">
 <div class="container overflow-hidden">
@@ -78,6 +78,6 @@ session_start();
 </div><!--.container-->
 
 <script src="../js/validate_register.js"></script>
-<?php include('import-scripts.php'); ?>
+<?php include('import-scripts.inc.php'); ?>
 </body>
 </html>

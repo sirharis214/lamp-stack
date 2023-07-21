@@ -1,6 +1,6 @@
 <html>
 <head>
-	<?php include('import-head.php'); ?>
+	<?php include('import-head.inc.php'); ?>
 </head>
 <body>
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
@@ -76,9 +76,6 @@
         </main>
     </div> <!-- .row -->
 </div> <!-- .container-fluid -->
-<!-- <?php include('import-scripts.php'); ?> -->
-<script src="https://kit.fontawesome.com/ba44f6fe56.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-
+<?php include('import-scripts.inc.php'); ?>
 </body>
 </html>
