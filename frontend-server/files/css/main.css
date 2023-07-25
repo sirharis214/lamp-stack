@@ -33,3 +33,10 @@ html, body {
   color: #2470dc;
 }
 
+.is-valid {
+    border-color: #28a745; /* Green border for valid input */
+  }
+
+.is-invalid {
+    border-color: #dc3545; /* Red border for invalid input */
+  }

@@ -62,14 +62,45 @@ include('session-check.inc.php');
                     <?php echo $msg; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            <?php } endif; #unset($_SESSION['messages']);?>
+            <?php } endif; unset($_SESSION['messages']);?>
         </div>
+        <!-- client side error messages -->
+		<div class="alert alert-danger alert-dismissible fade show" role="alert" id="error-message" style="display: none;">
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
         <div class="container mt-4">
             <!-- Centered Heading -->
             <div class="text-center">
-                <h1>Test Page</h1>
+                <h1>New Home Page</h1>
             </div>
-
+			<?php
+			if (isset($_SESSION['role']) AND $_SESSION['role']=='admin'):
+				require('../../php/data.inc.php');				
+				$userData = new Data();
+				$data = $userData->get_all_users_data();
+			?>
+			
+			<div class="table-responsive" style="max-height: 300px;">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created On</th>
+                            <th>Updated On</th>
+                            <th>Action</th>
+                            <!-- Add more columns as needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                    	<?php include('admin-user-table.inc.php');?>
+                    </tbody>
+                </table>
+            </div>
+			<?php endif;?>
+			
             <!-- Scrollable Fixed Height and Width Table -->
             <div class="table-responsive" style="max-height: 300px;">
                 <table class="table table-bordered table-striped">
@@ -157,8 +188,9 @@ include('session-check.inc.php');
             </div>
         </div>
     </div> <!-- .content flex-grow-1 -->
-
-    <?php include('import-scripts.inc.php'); ?>
+    
+	<script src="../js/validate_update_user.js"></script>
+	<?php include('import-scripts.inc.php'); ?>
 </body>
 
 </html>

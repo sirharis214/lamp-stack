@@ -6,6 +6,35 @@ session_start();
 $rabbitmq_client = new rabbitmqClient("rabbitmq.ini", "rabbitmq-server"); // $ini_file, $server
 $backend_client = new rabbitmqClient("rabbitmq.ini", "backend-server"); // $ini_file, $server
 
+function data($request) {
+	global $backend_client;
+	$response = $backend_client->send_request($request);
+	return $response;
+}
+
+/* Function to sanitize user input and prevent SQL injection */
+function sanitizeInput($input) {
+    return htmlspecialchars(strip_tags($input));
+}
+
+/* Form Post's */
+function updateUser($action) {
+	global $backend_client;
+	$current_time = date("m/d/Y H:i:s");
+	
+	$request = array();
+	$request['type'] = $action; // update-user
+	$request['data'] = array(
+		"id" => sanitizeInput($_POST['id']),
+		"username" => sanitizeInput($_POST["username"]), 
+		"email" => sanitizeInput($_POST['email']),
+		"role" => sanitizeInput($_POST['role']),
+		"updated_on" => $current_time,
+	);
+	$response = $backend_client->send_request($request);
+	return $response;
+}
+
 function register() {
 	global $backend_client;
 	$default_role = "read_only";
@@ -70,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$_SESSION['messages'] = $response['messages'];
 				if ($response['status']==true) {
 					$_SESSION['authenticated'] = true;
+					$_SESSION['role'] = $response['role'];
 					$_SESSION['last_activity'] = time();
 					header('location:../files/sites/home.php');
 				} else if ($response["status"]==false) {
@@ -85,6 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					header('location:../files/sites/register.php');
 				}
                 break;
+            case 'update-user':
+            	$response = updateUser($action);
+            	$_SESSION['messages'] = $response['messages'];
+            	header('location:../files/sites/home.php');
+            	break;
             default:
                 $_SESSION['messages'] = "Invalid action!";
                 header('location:../login.php');

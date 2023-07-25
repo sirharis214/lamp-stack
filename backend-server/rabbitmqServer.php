@@ -3,6 +3,47 @@
 require_once('rabbitMQLib.inc');
 require_once('db.php.inc');
 
+function updateUser($data) {
+	$response = array();
+	$response["status"] = false;
+	$response["messages"] = array();
+	
+	$db_data = new Data();
+	$updateUser_response = $db_data->updateUser($data);
+	
+	# update response messages
+	foreach($updateUser_response['messages'] as $msg){
+		array_push($response['messages'], $msg);
+	}
+	# check response status
+	if ($updateUser_response['status'] === true) {
+		$response['status'] = true;
+	}
+	print_r($response);
+	return $response;
+}
+
+function get_all_users_data() {
+	$response = array();
+	$response["status"] = false;
+	$response["messages"] = array();
+	
+	$data = new Data();
+	$all_users_data_response = $data->get_all_users_data();
+	
+	# update response messages
+	foreach($all_users_data_response['messages'] as $msg){
+		array_push($response['messages'], $msg);
+	}
+	# if response status is true, update response and return it
+	if ($all_users_data_response['status']) {
+		$response['status'] = true;
+		$response['data'] = $all_users_data_response['data'];
+	}
+	echo(count($response['data'])." Rows of data".PHP_EOL );
+	return $response;
+}
+
 function register($data) {
 	$response = array();
 	$response["status"] = false;
@@ -37,6 +78,7 @@ function login($data){
 	# check if login was successful or not
 	if($check_login_response['status'] == true){
 		$response["status"] = true;
+		$response["role"] = $check_login_response['role'];
 	}
 	
 	//var_dump($check_login_response);
@@ -65,6 +107,10 @@ function requestProcessor($request){
 				return login($request['data']);
 			case "register":
 				return register($request['data']);
+			case "get_all_users_data":
+				return get_all_users_data();
+			case "update-user":
+				return updateUser($request['data']);
 		}
 	
 		return array("returnCode"=>"0", "message"=>"Server received request and processed");
