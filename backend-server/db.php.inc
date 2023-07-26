@@ -159,6 +159,47 @@ class Data {
 		//echo "Connected to database".PHP_EOL;
 	}
 	
+	public function deleteUser($data) {
+		$tableName = 'Users';
+		$response = array();
+		$response["status"] = false;
+		$response["messages"] = array();
+		if (!$this->db_connection) {
+			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			return $response;
+		}
+		
+		$userId = $data['id'];
+		$username = $data['username'];
+		$email = $data['email'];
+		
+		echo "Performing deleteUser".PHP_EOL;
+		try {
+			// Prepare the query
+			$query = "DELETE FROM $tableName WHERE id = ? AND email = ?";
+
+			// Prepare and execute the statement
+			$stmt = $this->db_connection->prepare($query);
+			$stmt->bind_param("ss", $userId, $email);
+			$result = $stmt->execute();
+
+			if ($result) {
+				echo "Delete query executed successfully.".PHP_EOL;
+				$response["status"] = true;
+				array_push($response["messages"], "Deleted user $username");
+			} else {
+				// If there was an error executing the query, you can check the error message for debugging
+				echo "Error executing the delete query: " . $stmt->errorInfo()[2].PHP_EOL;
+				array_push($response["messages"], "Error executing the delete query: " . $stmt->errorInfo()[2]);
+			}
+		} catch (Exception $e) {
+		    // Handle the exception
+		    echo "Error: " . $e->getMessage().PHP_EOL;
+		    array_push($response["messages"], "Sorry, we're experiencing a db error: ". $e->getMessage() );
+		}
+		return $response; 
+	}
+	
 	public function updateUser($data) {
 		$tableName = 'Users';
 		$response = array();
@@ -214,7 +255,7 @@ class Data {
 			return $response;
 		}
 		
-		echo "Performing get_all_users_data".PHP_EOL;
+		#echo "Performing get_all_users_data".PHP_EOL;
 		try {
 			$query = "SELECT id,username,email,role,created_on,updated_on FROM $tableName";
 		    $stmt = $this->db_connection->prepare($query);

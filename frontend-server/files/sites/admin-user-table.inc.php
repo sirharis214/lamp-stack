@@ -22,7 +22,7 @@ if(isset($_SESSION['table_data']) AND $_SESSION['table_data']==true):
 		    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div><!-- modal-header-->
 		  <div class="modal-body">
-		    <form action="../../php/client.php" method="POST" name="update-user-form">
+		    <form action="../../php/client.php" method="POST" name="update-user-form" id="update-user-form">
 		      <div class="row mb-3">
 		        <div class="col">
 		          <label for="username" class="form-label">Username</label>
@@ -57,13 +57,25 @@ if(isset($_SESSION['table_data']) AND $_SESSION['table_data']==true):
 		          <label class="form-label">Updated On</label>
 		          <input type="text" class="form-control" <?php echo "value='" .$row['updated_on']. "'";?> readonly>
 		        </div>
-		      </div>
+		      </div> <!-- .row -->
 		      <div class="modal-footer">
-		      	<input type="hidden" name="id" <?php echo "value='".$row['id']."'";?> >
-		      	<input type="hidden" name="action" value="update-user">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<button type="submit" class="btn btn-primary" name="update-user">Save changes</button>
-			  </div> <!-- modal-footer-->
+				  <input type="hidden" name="id" <?php echo "value='".$row['id']."'";?>>
+				  <input type="hidden" name="action" id="action" value="update-user">
+
+				  <!-- Dropdown for "Delete User" -->
+				  <div class="btn-group">
+					<button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+					  Delete User
+					</button>
+					<ul class="dropdown-menu">
+					  <li><button type="button" class="btn btn-danger dropdown-item" name="delete-user" id="confirm-delete">Confirm Delete</button></li>
+					</ul>
+				  </div>
+
+				  <!-- Buttons for "Close" and "Save changes" -->
+				  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				  <button type="button" class="btn btn-primary" name="update-user" id="update-user">Save changes</button>
+			  </div><!-- modal-footer-->
 		    </form>	    
 		  </div> <!-- modal-body-->
 		</div><!-- modal-content-->

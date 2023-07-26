@@ -1,53 +1,58 @@
 $(document).ready(function() {
-	// Function to validate the username format
-	function validateUsernameFormat(usernameInput, usernameFeedback) {
-	  const username = usernameInput.value.trim();
-      const usernameFormat = /^[a-zA-Z]+\.[a-zA-Z]+$/; // Format: string.string
+  // Function to validate the username format
+  function isValidUsername(username) {
+    // Add your username validation logic here
+    // For example, you can use a regular expression to check the format
+    // Replace the 'regexPattern' with your desired pattern
+    const regexPattern = /^[a-zA-Z]+\.[a-zA-Z]+$/;
+    return regexPattern.test(username);
+  }
 
-	  if (!usernameFormat.test(username)) {
-		usernameFeedback.textContent = 'Invalid username format (e.g., string.string)';
-		usernameInput.classList.add('is-invalid');
-		usernameInput.classList.remove('is-valid');
-		return false;
-	  } else {
-		usernameFeedback.textContent = '';
-		usernameInput.classList.remove('is-invalid');
-		usernameInput.classList.add('is-valid');
-		return true;
-	  }
-	}
-	
-	// Event listener for keyup on dynamic modals
-    $(document).on('keyup', '.modal input[name="username"]', function () {
-    	const usernameInput = this;
-    	const usernameFeedback = this.nextElementSibling;
-    	validateUsernameFormat(usernameInput, usernameFeedback);
-  	});
-  	
-  	// Form submit event handler for dynamic modals
-    $(document).on('submit', 'form[name="update-user-form"]', function (e) {
-    	const usernameInput = this.elements['username'];
-    	const usernameFeedback = usernameInput.nextElementSibling;
+  // Function to validate the username format and show feedback
+  function validateUsernameFormat(usernameInput, usernameFeedback) {
+    const username = usernameInput.value;
+    if (!isValidUsername(username)) {
+      usernameFeedback.textContent = "Username format is invalid. It should be in the format 'string.string'.";
+      usernameInput.classList.add('is-invalid');
+      usernameInput.classList.remove('is-valid');
+    } else {
+      usernameFeedback.textContent = ""; // Clear the error message
+      usernameInput.classList.add('is-valid');
+      usernameInput.classList.remove('is-invalid');
+    }
+  }
 
-    	if (!validateUsernameFormat(usernameInput, usernameFeedback)) {
-      		e.preventDefault(); // Prevent form submission
-      		// Store error messages in session as JSON
-      		//sessionStorage.setItem('updateUserErrorMessages', JSON.stringify(['Invalid username format (e.g., string.string)']));
-    	}
-    });
-    
-    // Check for stored error messages on page load
-    /*var storedErrorMessagesJSON = sessionStorage.getItem('updateUserErrorMessages');
-    if (storedErrorMessagesJSON) {
-    	// Parse the stored error messages as an array
-    	var storedErrorMessages = JSON.parse(storedErrorMessagesJSON);
+  // Event listener for keyup on dynamic modals
+  $(document).on('keyup', '.modal input[name="username"]', function() {
+    const usernameInput = this;
+    const usernameFeedback = this.nextElementSibling;
+    validateUsernameFormat(usernameInput, usernameFeedback);
+  });
 
-    	// Display each stored error message
-    	storedErrorMessages.forEach(function (errorMessage) {
-      	$('#error-message').append('<p>' + errorMessage + '</p>').css('display', 'block');
-    	});
+  // Function to handle the form submission
+  function handleSubmit(action, modalId) {
+    const modal = $("#" + modalId);
 
-    	// Clear stored error messages from session
-    	sessionStorage.removeItem('updateUserErrorMessages');
-  	}*/
+    // Update the value of the hidden input named "action"
+    modal.find("#action").val(action);
+
+    // Submit the form
+    modal.find("form").submit();
+  }
+
+  // Click event for "Update User" button
+  $(document).on("click", "#update-user", function(event) {
+    const modalId = $(this).closest(".modal").attr("id");
+    handleSubmit("update-user", modalId);
+
+    // Prevent the default form submission behavior
+    event.preventDefault();
+  });
+
+  // Click event for "Confirm Delete" button
+  $(document).on("click", "#confirm-delete", function() {
+    const modalId = $(this).closest(".modal").attr("id");
+    handleSubmit("delete-user", modalId);
+  });
 });
+

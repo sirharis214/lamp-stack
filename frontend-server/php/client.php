@@ -18,12 +18,26 @@ function sanitizeInput($input) {
 }
 
 /* Form Post's */
-function updateUser($action) {
+function deleteUser() {
+	global $backend_client;
+	
+	$request = array();
+	$request['type'] = "delete-user"; // delete-user
+	$request['data'] = array(
+		"id" => sanitizeInput($_POST['id']),
+		"username" => sanitizeInput($_POST["username"]), 
+		"email" => sanitizeInput($_POST['email']),
+	);
+	$response = $backend_client->send_request($request);
+	return $response;
+}
+
+function updateUser() {
 	global $backend_client;
 	$current_time = date("m/d/Y H:i:s");
 	
 	$request = array();
-	$request['type'] = $action; // update-user
+	$request['type'] = "update-user"; // update-user
 	$request['data'] = array(
 		"id" => sanitizeInput($_POST['id']),
 		"username" => sanitizeInput($_POST["username"]), 
@@ -116,7 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				}
                 break;
             case 'update-user':
-            	$response = updateUser($action);
+            	$response = updateUser();
+            	$_SESSION['messages'] = $response['messages'];
+            	header('location:../files/sites/home.php');
+            	break;
+            case 'delete-user':
+            	$response = deleteUser();
             	$_SESSION['messages'] = $response['messages'];
             	header('location:../files/sites/home.php');
             	break;
