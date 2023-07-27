@@ -1,6 +1,7 @@
 <?php
+// All alert messages that need to be returned to client should be generated here and added to $response['messages'].
 
-class User{
+class Auth{
 	private $db_connection;
 	private $host = "localhost";
 	private $user = "haris_db_user";
@@ -11,19 +12,19 @@ class User{
 		try {
 			$this->db_connection = new mysqli($this->host, $this->user, $this->pass, $this->db);
 		} catch(Exception $e) {
-  			echo 'Database connection error: '.$e->getMessage().PHP_EOL;
+  			echo "Database connection error: ".$e->getMessage().PHP_EOL;
   		}
 		//echo "Connected to database".PHP_EOL;
-	}//close _construct
+	}
 	
 	public function validateLogin($data) {
-		$tableName = 'Users';
+		$tableName = "Users";
 		$response = array();
-		$response["status"] = false;
-		$response["messages"] = array();
+		$response['status'] = false;
+		$response['messages'] = array();
 		
 		if (!$this->db_connection) {
-			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			array_push($response['messages'], "Sorry, we're currently experiencing database issues, Please try again later.");
 			return $response;
 		}
 		
@@ -42,7 +43,7 @@ class User{
 		        if ($result->num_rows === 0) {
 				// No record found with the given email
 				echo "No records found with the email: $_email".PHP_EOL;
-        			array_push($response["messages"], "No records found for $_email");
+        			array_push($response['messages'], "No records found for $_email");
 			} else {
 				// Record found, check the password
 				$row = $result->fetch_assoc();
@@ -52,14 +53,14 @@ class User{
 				if (password_verify($_password, $hashedPasswordFromDB) ) {
 				    // Password matches, authentication successful
 				    echo "Authentication successful!".PHP_EOL;
-				    $response["status"] = true;
-				    $response["role"] = $row['role'];
-				    array_push($response["messages"], "Logged in as $_email");
+				    $response['status'] = true;
+				    $response['role'] = $row['role'];
+				    array_push($response['messages'], "Logged in as $_email");
 				    
 				} else {
 				    // Password does not match
 				    echo "Error: Incorrect password.".PHP_EOL;
-				    array_push($response["messages"], "Incorrect password for $_email");
+				    array_push($response['messages'], "Incorrect password for $_email");
 				}
 			}
 			// Close the statement and the database connection
@@ -68,19 +69,19 @@ class User{
 		} catch (Exception $e) {
 			// Handle the exception
     			echo "Error: " . $e->getMessage().PHP_EOL;
-    			array_push($response["messages"], "Sorry, there was an issue processing your request: ". $e->getMessage() );
+    			array_push($response['messages'], "Sorry, there was an issue processing your request: ". $e->getMessage() );
 		}
 		return $response;
 	}
 	
 	public function registerUser($data) {
-		$tableName = 'Users';
+		$tableName = "Users";
 		$response = array();
-		$response["status"] = false;
-		$response["messages"] = array();
+		$response['status'] = false;
+		$response['messages'] = array();
 		
 		if (!$this->db_connection) {
-			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			array_push($response['messages'], "Sorry, we're currently experiencing database issues, Please try again later!");
 			return $response;
 		}
 		
@@ -103,32 +104,32 @@ class User{
 		        $emailCount = $row['email_count'];
 
 		        if ($emailCount > 0) {
-				echo "Error: Email $_email already exists in the database.".PHP_EOL;
-				array_push($response["messages"], "Sorry, an account already exists with the email $_email");
+					echo "Error: Email $_email already exists in the database.".PHP_EOL;
+					array_push($response['messages'], "Sorry, an account already exists with the email $_email");
 		        } else {
-		        	// Create the SQL query
-				$sql = "INSERT INTO $tableName (username, email, role, created_on, hashed_data) VALUES (?, ?, ?, ?, ?)";
+				    // Create the SQL query
+					$sql = "INSERT INTO $tableName (username, email, role, created_on, hashed_data) VALUES (?, ?, ?, ?, ?)";
+					
+					// Prepare the statement
+					$stmt = $this->db_connection->prepare($sql);
+					
+					// Bind the parameters and execute the query
+					$stmt->bind_param("sssss", $_username, $_email, $_role, $_created_on, $_hashed_data);
+					$stmt->execute();
 				
-				// Prepare the statement
-				$stmt = $this->db_connection->prepare($sql);
-				
-				// Bind the parameters and execute the query
-				$stmt->bind_param("sssss", $_username, $_email, $_role, $_created_on, $_hashed_data);
-				$stmt->execute();
-				
-				// Check if the insertion was successful
-				if ($stmt->affected_rows > 0) {
-					echo "Record inserted successfully.".PHP_EOL;
-					$response["status"] = true;
-					array_push($response["messages"], "Registered $_username successfully.");
-				} else {
-					echo "Error inserting record: " . $stmt->error.PHP_EOL;
-					# array_push($response["messages"], "Error registering $_username: " . $stmt->error);
-					array_push($response["messages"], "Error registering $_username with email $_email");
-				}
+					// Check if the insertion was successful
+					if ($stmt->affected_rows > 0) {
+						echo "Record inserted successfully.".PHP_EOL;
+						$response['status'] = true;
+						array_push($response['messages'], "Registered $_username successfully.");
+					} else {
+						echo "Error inserting record: " . $stmt->error.PHP_EOL;
+						# array_push($response['messages'], "Error registering $_username: " . $stmt->error);
+						array_push($response['messages'], "Error registering $_username with email $_email");
+					}
 
-				// Close the statement and the database connection
-				$stmt->close();
+					// Close the statement and the database connection
+					$stmt->close();
 		        }
 			// Close check statement and db connection
 			$checkStmt->close();
@@ -136,12 +137,11 @@ class User{
 		} catch (Exception $e) {
 		    // Handle the exception
 		    echo "Error: " . $e->getMessage().PHP_EOL;
-		    array_push($response["messages"], "Sorry, we're experiencing a db error: ". $e->getMessage() );
+		    array_push($response['messages'], "Sorry, we're experiencing a db error: ". $e->getMessage() );
 		}
-		
 		return $response;
 	}
-} // close User class
+} // close Auth class
 
 class Data {
 	private $db_connection;
@@ -154,18 +154,18 @@ class Data {
 		try {
 			$this->db_connection = new mysqli($this->host, $this->user, $this->pass, $this->db);
 		} catch(Exception $e) {
-  			echo 'Database connection error: '.$e->getMessage().PHP_EOL;
+  			echo "Database connection error: ".$e->getMessage().PHP_EOL;
   		}
 		//echo "Connected to database".PHP_EOL;
 	}
 	
 	public function deleteUser($data) {
-		$tableName = 'Users';
+		$tableName = "Users";
 		$response = array();
-		$response["status"] = false;
-		$response["messages"] = array();
+		$response['status'] = false;
+		$response['messages'] = array();
 		if (!$this->db_connection) {
-			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			array_push($response['messages'], "Sorry, we're currently experiencing database issues, Please try again later");
 			return $response;
 		}
 		
@@ -185,28 +185,31 @@ class Data {
 
 			if ($result) {
 				echo "Delete query executed successfully.".PHP_EOL;
-				$response["status"] = true;
-				array_push($response["messages"], "Deleted user $username");
+				$response['status'] = true;
+				array_push($response['messages'], "Deleted user $username");
 			} else {
 				// If there was an error executing the query, you can check the error message for debugging
 				echo "Error executing the delete query: " . $stmt->errorInfo()[2].PHP_EOL;
-				array_push($response["messages"], "Error executing the delete query: " . $stmt->errorInfo()[2]);
+				array_push($response['messages'], "Error executing the delete query: " . $stmt->errorInfo()[2]);
 			}
+			
+			$stmt->close();
+			$this->db_connection->close();
 		} catch (Exception $e) {
 		    // Handle the exception
 		    echo "Error: " . $e->getMessage().PHP_EOL;
-		    array_push($response["messages"], "Sorry, we're experiencing a db error: ". $e->getMessage() );
+		    array_push($response['messages'], "Sorry, we're experiencing a db error: ". $e->getMessage() );
 		}
 		return $response; 
 	}
 	
 	public function updateUser($data) {
-		$tableName = 'Users';
+		$tableName = "Users";
 		$response = array();
 		$response["status"] = false;
-		$response["messages"] = array();
+		$response['messages'] = array();
 		if (!$this->db_connection) {
-			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			array_push($response['messages'], "Sorry, we're currently experiencing database issues, Please try again later.");
 			return $response;
 		}
 		
@@ -227,31 +230,33 @@ class Data {
 			$user = mysqli_fetch_assoc($result);
 
 			// Check if the fields have changed
-			if ($user["username"] !== $newUsername || $user["email"] !== $newEmail || $user["role"] !== $newRole) {
+			if ($user['username'] !== $newUsername || $user['email'] !== $newEmail || $user['role'] !== $newRole) {
 				// Update the user's information in the database
 				$sql = "UPDATE Users SET username = '$newUsername', email = '$newEmail', role = '$newRole', updated_on = '$updated_on' WHERE id = '$userId'";
 				mysqli_query($this->db_connection, $sql);
-				$response["status"] = true;
-				array_push($response["messages"], "Updated $newUsername");
+				$response['status'] = true;
+				array_push($response['messages'], "Updated $newUsername");
 			} else {
-				array_push($response["messages"], "$newUsername Information Unchanged");
+				array_push($response['messages'], "$newUsername Information Unchanged");
 			}
+			
+			$this->db_connection->close();
 		} catch (Exception $e) {
 		    // Handle the exception
 		    echo "Error: " . $e->getMessage().PHP_EOL;
-		    array_push($response["messages"], "Sorry, we're experiencing a db error: ". $e->getMessage() );
+		    array_push($response['messages'], "Sorry, we're experiencing a db error: ". $e->getMessage() );
 		}
 		return $response;    
 	}
 	
 	public function get_all_users_data() {
-		$tableName = 'Users';
+		$tableName = "Users";
 		$response = array();
-		$response["status"] = false;
-		$response["messages"] = array();
+		$response['status'] = false;
+		$response['messages'] = array();
 		
 		if (!$this->db_connection) {
-			array_push($response["messages"], "Sorry, we're currently experiencing database issues, Please try again later!");
+			array_push($response['messages'], "Sorry, we're currently experiencing database issues, Please try again later.");
 			return $response;
 		}
 		
@@ -263,23 +268,27 @@ class Data {
 		    $result = $stmt->get_result();
 		        
 		    if ($result->num_rows > 0) {
-		        $response["status"] = true;
-				array_push($response["messages"], "data retrieved for get_all_users_data");
-				$response["data"] = array();
+		        $response['status'] = true;
+				array_push($response['messages'], "data retrieved for get_all_users_data");
+				$response['data'] = array();
 				// Output data of each row
 			    while ($row = $result->fetch_assoc()) {
-					array_push($response["data"], $row);
+					array_push($response['data'], $row);
 			    }
 			} else {
 				$msg = "No results found.";
 			    echo $msg.PHP_EOL;
-			    array_push($response["messages"], $msg);
+			    array_push($response['messages'], $msg);
 			}
+			
+			$stmt->close();
+			$this->db_connection->close();
 		} catch (Exception $e) {
 		    // Handle the exception
 		    echo "Error: " . $e->getMessage().PHP_EOL;
-		    array_push($response["messages"], "Sorry, we're experiencing a db error: ". $e->getMessage() );
+		    array_push($response['messages'], "Sorry, we're experiencing a db error: ". $e->getMessage() );
 		}
 		return $response;
 	}
-}
+} // close Data class
+

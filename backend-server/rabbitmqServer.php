@@ -5,13 +5,13 @@ require_once('db.php.inc');
 
 function deleteUser($data) {
 	$response = array();
-	$response["status"] = false;
-	$response["messages"] = array();
+	$response['status'] = false;
+	$response['messages'] = array();
 	
 	/* For Testing */
 	$status = true;	
 	echo "Performing deleteUser for ".$data['username'].PHP_EOL;
-	$response["status"] = $satus;
+	$response['status'] = $satus;
 	array_push($response['messages'], "Deleted user ".$data['username']);
 	
 	
@@ -34,83 +34,90 @@ function deleteUser($data) {
 
 function updateUser($data) {
 	$response = array();
-	$response["status"] = false;
-	$response["messages"] = array();
+	$response['status'] = false;
+	$response['messages'] = array();
 	
 	$db_data = new Data();
-	$updateUser_response = $db_data->updateUser($data);
+	$db_response = $db_data->updateUser($data);
 	
 	# update response messages
-	foreach($updateUser_response['messages'] as $msg){
+	foreach($db_response['messages'] as $msg){
 		array_push($response['messages'], $msg);
 	}
-	# check response status
-	if ($updateUser_response['status'] === true) {
+	
+	# check db_response status
+	if ($db_response['status'] === true) {
 		$response['status'] = true;
 	}
+	
 	print_r($response);
 	return $response;
 }
 
 function get_all_users_data() {
 	$response = array();
-	$response["status"] = false;
-	$response["messages"] = array();
+	$response['status'] = false;
+	$response['messages'] = array();
 	
-	$data = new Data();
-	$all_users_data_response = $data->get_all_users_data();
+	$db_data = new Data();
+	$db_response = $db_data->get_all_users_data();
 	
 	# update response messages
-	foreach($all_users_data_response['messages'] as $msg){
+	foreach($db_response['messages'] as $msg){
 		array_push($response['messages'], $msg);
 	}
-	# if response status is true, update response and return it
-	if ($all_users_data_response['status']) {
+	
+	# if db_response status is true, update response and return it
+	if ($db_response['status'] === true) {
 		$response['status'] = true;
-		$response['data'] = $all_users_data_response['data'];
+		$response['data'] = $db_response['data'];
 	}
+	
 	#echo(count($response['data'])." Rows of data".PHP_EOL );
 	return $response;
 }
 
 function register($data) {
 	$response = array();
-	$response["status"] = false;
-	$response["messages"] = array();
+	$response['status'] = false;
+	$response['messages'] = array();
 	
-	$register_user = new User();
-	$register_user_response = $register_user->registerUser($data);
+	$db_data = new Auth();
+	$db_response = $db_data->registerUser($data);
 	
 	# update response messages
-	foreach($register_user_response['messages'] as $msg){
+	foreach($db_response['messages'] as $msg){
 		array_push($response['messages'], $msg);
 	}
+	
 	# check if register was successful or not
-	if($register_user_response['status'] == true){
-		$response["status"] = true;
+	if($db_response['status'] === true){
+		$response['status'] = true;
 	}
+	
 	return $response;
 }
 
 function login($data){
 	$response = array();
-	$response["status"] = false;
-	$response["messages"] = array();
+	$response['status'] = false;
+	$response['messages'] = array();
 	
-	$check_login = new User();
-	$check_login_response = $check_login->validateLogin($data);
+	$db_data = new Auth();
+	$db_response = $db_data->validateLogin($data);
 	
 	# update response messages
-	foreach($check_login_response['messages'] as $msg){
+	foreach($db_response['messages'] as $msg){
 		array_push($response['messages'], $msg);
 	}
+	
 	# check if login was successful or not
-	if($check_login_response['status'] == true){
-		$response["status"] = true;
-		$response["role"] = $check_login_response['role'];
+	if($db_response['status'] === true){
+		$response['status'] = true;
+		$response['role'] = $db_response['role'];
 	}
 	
-	//var_dump($check_login_response);
+	//var_dump($db_response);
 	print_r($response);
 	return $response;
 }
@@ -143,7 +150,6 @@ function requestProcessor($request){
 			case "delete-user":
 				return deleteUser($request['data']);
 		}
-	
 		return array("returnCode"=>"0", "message"=>"Server received request and processed");
 	}
 }
