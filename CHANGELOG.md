@@ -1,4 +1,5 @@
 # v0.0.2
+* bash scripts for setup's and config updated output messages 
 * for admin login, display all user's from db Users table in scrollable html table
 	- can update username, email, role for users.
 	- username validation also occurs here
