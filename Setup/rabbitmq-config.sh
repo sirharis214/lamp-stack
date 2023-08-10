@@ -14,6 +14,7 @@ user_pass="p"
 prefix="data"
 exchange_name="${prefix}-exchange"
 exchange_type="direct"
+
 # rabbitmq server's rabbitmq consumer queue
 rabbitmq_queue_name="${prefix}-rabbitmq"
 rabbitmq_routing_key="${prefix}.rabbitmq"
@@ -95,4 +96,3 @@ welcome_message
 run_execution
 
 echo "Execution completed."
-

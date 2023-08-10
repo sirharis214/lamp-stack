@@ -57,7 +57,6 @@ session_start();
 					<input type="hidden" name="action" value="login">
 					<button class="w-100 btn btn-lg btn-primary" type="submit" name="login">Sign in</button>
 					<p class="mt-3"><a href="files/sites/register.php" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Signup Here</a></p>
-
 					<p class="mt-5 mb-3 text-body-secondary">&copy; 2023 - present</p>
 				</form>
   			</div><!--.card-->
