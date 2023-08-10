@@ -1,34 +1,73 @@
 #!/bin/bash
 
 root_file="/lib/systemd/system"
-service_name="backend-server.service"
+service_name="backend-service.service"
 server_file="/home/haris/Github/lamp-stack/backend-server/rabbitmqServer.php"
 
+# Function to get the terminal width
+get_terminal_width() {
+  tput cols
+}
 
-if [ ! -f "${root_file}/${service_name}" ]; then
-    echo "Creating ${service_name}"
-    touch "${root_file}/${service_name}"
-fi
+# Function to display the centered message
+centered_message() {
+  local message="$1"
+  local term_width=$(get_terminal_width)
 
-echo "Adding rabbitmq-server configuration"
-cat << EOF > "${root_file}/${service_name}"
-[Unit]
-Description= backend-server listening on Queue data-backend
+  local padding_length=$(( (term_width - ${#message} - 2) / 2 ))
+  local padding_left="$(printf '%*s' "$padding_length" "")"
+  local padding_right="$(printf '%*s' "$padding_length" "")"
 
-[Service]
-Type=simple
-ExecStart=/usr/bin/php -f ${server_file}
+  echo "${padding_left} ${message} ${padding_right}"
+}
 
-[Install]
-WantedBy=multi-user.target
-EOF
+# Define ANSI escape codes for colors
+GREEN="\033[0;32m"
+CYAN="\033[0;36m"
+RED="\033[1;31m"
+RESET="\033[0m"
 
-echo "Starting ${service_name}"
-sudo systemctl start ${service_name}
+# Function to display a green-colored message
+welcome_message() {
+  local welcome="LampStack | Backend Server | RabbitMQ Consumer Service"
+  echo -e "${GREEN}$(centered_message "$welcome")${RESET}"
+}
 
-#echo "Get ${service_name} status"
-#sudo systemctl status ${service_name}
+# Function to simulate a long-running process
+run_execution() {
+	if [ ! -f "${root_file}/${service_name}" ]; then
+		echo -e "${CYAN}Creating ${service_name} ${RESET}\t[ RUNNING ]"
+		touch "${root_file}/${service_name}"
+		echo -e "${CYAN}Creating ${service_name} ${RESET}\t[ ${GREEN}OK${RESET} ]"
+	fi
+	echo -e "${CYAN}Adding ${service_name} configuration${RESET}\t[ RUNNING ]"
+	cat << EOF > "${root_file}/${service_name}"
+	[Unit]
+	Description= ${service_name} listening on Queue data-backend
 
-echo "enabling ${service_name}"
-sudo systemctl enable ${service_name}
-                
+	[Service]
+	Type=simple
+	ExecStart=/usr/bin/php -f ${server_file}
+
+	[Install]
+	WantedBy=multi-user.target
+	EOF
+	echo -e "${CYAN}Adding ${service_name} configuration${RESET}\t[ ${GREEN}OK${RESET} ]"
+	echo -e "${CYAN}Starting ${service_name} ${RESET}\t[ RUNNING ]"
+	sudo systemctl start ${service_name}
+	echo -e "${CYAN}Starting ${service_name} ${RESET}\t[ ${GREEN}OK${RESET} ]"
+	#echo "Get ${service_name} status"
+	#sudo systemctl status ${service_name}
+
+	echo -e "${CYAN}Enabling ${service_name} ${RESET}\t[ RUNNING ]"
+	sudo systemctl enable ${service_name}
+	echo -e "${CYAN}Enabling ${service_name} ${RESET}\t[ ${GREEN}OK${RESET} ]"
+}
+
+# Call the welcome_message function to display the centered welcome message
+welcome_message
+
+# Call the run_execution function to execute the task and display its status
+run_execution
+
+echo "Execution completed."
