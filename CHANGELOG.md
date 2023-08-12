@@ -1,3 +1,7 @@
+# v0.0.3
+* Simplifying server setup and configuration by incorporating Ansible
+	- a forth VM will be added to host Ansible
+
 # v0.0.2
 * bash scripts for setup's and config updated output messages 
 * for admin login, display all user's from db Users table in scrollable html table

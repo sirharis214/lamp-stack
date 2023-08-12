@@ -1,0 +1,50 @@
+---
+- name: Install packages
+  hosts: all
+  become: true
+
+  pre_tasks:
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+
+  - name: Install Git, PHP, PHP-AMQP and Apache2 for frontend-server
+    apt:
+      name:
+        - git
+        - php
+        - php-amqp
+        - apache2
+      state: present
+    when: "'frontend_server' in group_names"
+
+  - name: Install Git, PHP, PHP-AMQP, and MySQL Server for backend-server
+    apt:
+      name:
+        - git
+        - php
+        - php-amqp
+        - mysql-server
+      state: present
+    when: "'backend_server' in group_names"
+
+- hosts: all
+  become: true
+  roles:
+    - base
+    
+- hosts: frontend_server
+  become: true
+  roles:
+    - frontend
+
+#- hosts: rabbitmq_server
+#  become: true
+#  roles:
+#    - rabbitmq    
+
+#- hosts: backend_server
+#  become: true
+#  roles:
+#    - backend
+

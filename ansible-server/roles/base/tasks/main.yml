@@ -1,0 +1,112 @@
+---
+- name: Configure global git user
+  environment:
+    HOME: "/home/haris"
+    USER: "haris"
+  vars:
+    config_file: "/home/haris/.gitconfig"
+    user_name: "sirharis214"
+    pat: ""  # Set your Personal Access Token here
+    credential_file: "/home/haris/.git-credentials"
+  
+  block:
+    - name: Check if git user name is already configured
+      command: git config --global user.name
+      register: git_name_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Check if git user email is already configured
+      command: git config --global user.email
+      register: git_email_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Configure global git user name if not already configured
+      command: git config --global user.name "{{ user_name }}"
+      when: git_name_check.rc != 0
+      ignore_errors: yes
+
+    - name: Configure global git user email if not already configured
+      command: git config --global user.email "hariskido214@gmail.com"
+      when: git_email_check.rc != 0
+      ignore_errors: yes
+
+    - name: Check if credential section is present in .gitconfig
+      shell: "grep -q '\\[credential\\]' {{ config_file }}"
+      register: credential_helper_check
+      changed_when: false
+      failed_when: false
+
+    - name: Add credential helper to .gitconfig if not present
+      blockinfile:
+        path: "/home/haris/.gitconfig"
+        block: |
+          [credential]
+              helper = store
+        marker: ""
+      when: credential_helper_check.rc != 0
+      
+    - name: Check if .git-credentials file exists
+      stat:
+        path: "{{ credential_file }}"
+      register: credential_file_check
+    
+    - name: Create .git-credentials file if not present
+      copy:
+        content: "https://{{ user_name }}:{{ pat }}@github.com"
+        dest: "{{ credential_file }}"
+      when: credential_file_check.stat.exists == false
+    
+    - name: Check if .git-credentials file content is already configured
+      shell: "cat {{ credential_file }}"
+      register: credential_content_check
+      changed_when: false
+      when: credential_file_check.stat.exists == true
+    
+    - name: Configure .git-credentials file if content is different
+      copy:
+        content: "https://{{ user_name }}:{{ pat }}@github.com"
+        dest: "{{ credential_file }}"
+      when: credential_file_check.stat.exists == true and credential_content_check.stdout != "https://{{ user_name }}:{{ pat }}@github.com"
+    
+  tags: frontend
+
+- name: Create Github dir and clone repo
+  environment:
+    HOME: "/home/haris"
+  vars:
+    github_dir: "{{ ansible_env.HOME }}/Github"
+  
+  block:
+    - name: Check if Github directory exists
+      stat:
+        path: "{{ github_dir }}"
+      register: github_dir_check
+      failed_when: false
+
+    - name: Create directory ~/Github
+      file:
+        path: "{{ github_dir }}"
+        state: directory
+      when: github_dir_check.stat.exists == false
+
+    - name: Check if repository already cloned
+      stat:
+        path: "{{ github_dir }}/lamp-stack"
+      register: repo_check
+      failed_when: false
+
+    - name: Clone GitHub repository
+      git:
+        repo: "https://github.com/sirharis214/lamp-stack.git"
+        dest: "{{ github_dir }}/lamp-stack"
+      when: repo_check.stat.exists == false
+
+    - name: Configure global git safe directory
+      command: git config --global --add safe.directory {{ github_dir }}/Github/lamp-stack
+      ignore_errors: yes
+      when: repo_check.stat.exists == false
+
+  tags: frontend
+

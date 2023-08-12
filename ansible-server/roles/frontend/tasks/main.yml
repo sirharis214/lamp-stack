@@ -1,0 +1,21 @@
+---
+- name: Copy lamp-stack/frontend-server content into /var/www/html
+  environment:
+    HOME: "/home/haris"
+  vars:
+    github_dir: "{{ ansible_env.HOME }}/Github/lamp-stack"
+  
+  block:
+    - name: Delete contents of /var/www/html/
+      file:
+        path: /var/www/html/
+        state: absent
+
+    - name: Copy new frontend contents
+      copy:
+        src: "{{ ansible_env.HOME }}/Github/lamp-stack/frontend-server/"
+        dest: /var/www/html/
+        remote_src: yes
+      notify: Restart Apache
+  tags: frontend
+  
