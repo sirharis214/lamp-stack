@@ -1,0 +1,10 @@
+[Unit]
+Description={{ service_description }} listening on Queue {{ queue_name }}
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/php -f {{ server_file }}
+
+[Install]
+WantedBy=multi-user.target
+

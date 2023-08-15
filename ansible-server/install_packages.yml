@@ -17,7 +17,17 @@
         - apache2
       state: present
     when: "'frontend_server' in group_names"
-
+  
+  - name: Install Git, PHP, PHP-AMQP, and MySQL Server for backend-server
+    apt:
+      name:
+        - git
+        - php
+        - php-amqp
+        - rabbitmq-server
+      state: present
+    when: "'rabbitmq_server' in group_names"
+  
   - name: Install Git, PHP, PHP-AMQP, and MySQL Server for backend-server
     apt:
       name:
@@ -38,10 +48,10 @@
   roles:
     - frontend
 
-#- hosts: rabbitmq_server
-#  become: true
-#  roles:
-#    - rabbitmq    
+- hosts: rabbitmq_server
+  become: true
+  roles:
+    - rabbitmq    
 
 #- hosts: backend_server
 #  become: true
