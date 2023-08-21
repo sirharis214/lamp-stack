@@ -1,93 +1,31 @@
----
-# Set the HOME environment variable for the entire role
-environment:
-  HOME: "/home/haris"
-  USER: "haris"
-  
-- name: Create and configure backend-service systemd service
-  block:
-    - name: Check if systemd service file exists
-      stat:
-        path: "/lib/systemd/system/backend-service.service"
-      register: service_file_stat
-
-    - name: Create systemd service file
-      file:
-        path: "/lib/systemd/system/backend-service.service"
-        state: touch
-      when: not service_file_stat.stat.exists
-
-    - name: Configure systemd service
-      copy:
-        content: |
-          [Unit]
-          Description= backend-service listening on Queue data-backend
-
-          [Service]
-          Type=simple
-          ExecStart=/usr/bin/php -f {{ github_dir }}/backend-server/rabbitmqServer.php
-
-          [Install]
-          WantedBy=multi-user.target
-        dest: "/lib/systemd/system/backend-service.service"
-      vars:
-        github_dir: "{{ ansible_env.HOME }}/Github/lamp-stack"
-      when: not service_file_stat.stat.exists
-
-    - name: Start and enable systemd service
-      systemd:
-        name: backend-service.service
-        enabled: yes
-        state: started
-        
-  tags: backend
-
-- name: Set up MySQL database, user, table
-  block:
-    - name: Check if MySQL server is installed
-      stat:
-        path: "/usr/bin/mysql"
-      register: mysql_installed
-
-    - name: Install MySQL server if not installed
-      apt:
-        name: mysql-server
-        state: present
-      when: not mysql_installed.stat.exists
-
-    - name: Create MySQL database
-      command: mysql -e "CREATE DATABASE {{ db_name }}"
-      args:
-        executable: /usr/bin/mysql
-      ignore_errors: yes
-      register: create_db_result
-
-    - name: Create MySQL user
-      command: mysql -e "CREATE USER '{{ user_name }}'@'localhost' IDENTIFIED BY '{{ user_pass }}';"
-      args:
-        executable: /usr/bin/mysql
-      ignore_errors: yes
-      register: create_user_result
-
-    - name: Grant privileges to MySQL user
-      command: mysql -e "GRANT ALL PRIVILEGES ON {{ db_name }}.* TO '{{ user_name }}'@'localhost'; FLUSH PRIVILEGES;"
-      args:
-        executable: /usr/bin/mysql
-      ignore_errors: yes
-      register: grant_privileges_result
-
-    - name: Create MySQL table
-      command: mysql -e "USE {{ db_name }}; CREATE TABLE {{ table_name }}(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, role VARCHAR(255) NOT NULL, created_on VARCHAR(255) NOT NULL, updated_on VARCHAR(255), hashed_data VARCHAR(255) NOT NULL);"
-      args:
-        executable: /usr/bin/mysql
-      ignore_errors: yes
-      register: create_table_result
-
+- name: Execute MySQL configuration script on remote machine
   vars:
-    db_name: "dev_db"
-    user_name: "haris_db_user"
-    user_pass: "p"
-    table_name: "Users"
+    #script_path: "/home/haris/Github/lamp-stack/Setup/mysql_config.sh"
+    script_path: "/home/haris/mysql_config.sh"
+  block:
+    - name: Check if the script exists
+      stat:
+        path: "{{ script_path }}"
+      register: script_check
 
+    - name: Execute the MySQL configuration script on remote machine
+      command: "{{ script_path }}"
+      args:
+        executable: /bin/bash  # Specify the interpreter for the script
+      register: script_execution_result
+      changed_when: false  # Do not treat script execution as a change
+
+    - name: Display execution status
+      debug:
+        msg: |
+          Execution of MySQL configuration script completed.
+          Exit Status: {{ script_execution_result.rc }}
+          Standard Output:
+          {{ script_execution_result.stdout }}
+          Standard Error:
+          {{ script_execution_result.stderr }}
+  
   tags: backend
+
+- include_tasks: create_service.yml
 

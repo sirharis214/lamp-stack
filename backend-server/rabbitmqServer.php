@@ -140,7 +140,7 @@ function requestProcessor($request){
 			case "test":
 				return array("returnCode"=>"0", "message"=>"recieved type:test");
 			case "login":
-				return login($request['data']);
+				return login2($request['data']);
 			case "register":
 				return register($request['data']);
 			case "get_all_users_data":

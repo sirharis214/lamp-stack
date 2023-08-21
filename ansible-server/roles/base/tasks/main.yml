@@ -70,13 +70,13 @@
         dest: "{{ credential_file }}"
       when: credential_file_check.stat.exists == true and credential_content_check.stdout != "https://{{ user_name }}:{{ pat }}@github.com"
     
-  tags: frontend
+  tags: base
 
 - name: Create Github dir and clone repo
   environment:
     HOME: "/home/haris"
   vars:
-    github_dir: "{{ ansible_env.HOME }}/Github"
+    github_dir: "/home/haris/Github"
   
   block:
     - name: Check if Github directory exists
@@ -104,9 +104,9 @@
       when: repo_check.stat.exists == false
 
     - name: Configure global git safe directory
-      command: git config --global --add safe.directory {{ github_dir }}/Github/lamp-stack
+      command: git config --global --add safe.directory {{ github_dir }}/lamp-stack
       ignore_errors: yes
       when: repo_check.stat.exists == false
 
-  tags: frontend
+  tags: base
 

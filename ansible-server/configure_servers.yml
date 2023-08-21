@@ -7,8 +7,8 @@
   - name: Update apt cache
     apt:
       update_cache: yes
-
-  - name: Install Git, PHP, PHP-AMQP and Apache2 for frontend-server
+  
+  - name: Install frontend-server dependencies - Git, PHP, PHP-AMQP, Apache2
     apt:
       name:
         - git
@@ -18,7 +18,7 @@
       state: present
     when: "'frontend_server' in group_names"
   
-  - name: Install Git, PHP, PHP-AMQP, and MySQL Server for backend-server
+  - name: Install rabbitmq-server dependencies - Git, PHP, PHP-AMQP, RabbitMQ-Server
     apt:
       name:
         - git
@@ -28,7 +28,7 @@
       state: present
     when: "'rabbitmq_server' in group_names"
   
-  - name: Install Git, PHP, PHP-AMQP, and MySQL Server for backend-server
+  - name: Install backend-server dependencies - Git, PHP, PHP-AMQP, MySQL-Server, python3-pymysql
     apt:
       name:
         - git
@@ -36,6 +36,7 @@
         - php-amqp
         - mysql-server
       state: present
+    become: true
     when: "'backend_server' in group_names"
 
 - hosts: all
@@ -53,8 +54,8 @@
   roles:
     - rabbitmq    
 
-#- hosts: backend_server
-#  become: true
-#  roles:
-#    - backend
+- hosts: backend_server
+  become: true
+  roles:
+    - backend
 

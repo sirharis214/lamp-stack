@@ -6,6 +6,11 @@
     github_dir: "{{ ansible_env.HOME }}/Github/lamp-stack"
   
   block:
+    - name: Update lamp-stack repository
+      command: git pull
+      args:
+        chdir: "{{ github_dir }}"
+        
     - name: Delete contents of /var/www/html/
       file:
         path: /var/www/html/

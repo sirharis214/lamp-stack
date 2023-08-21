@@ -1,98 +1,86 @@
 # lamp-stack
-This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. The main purpose is to demonstrate a 2 way communication between the application's frontend and backend using a message broker, RabbitMQ. 
+This is a sample full stack SAAS using Linux, Apache, Mysql, Php and  RabbitMQ. The main purpose is to demonstrate a 2 way communication between the application's frontend and backend using a message broker, RabbitMQ. We will also utilize Ansible to help manage and configure the server's.
 
 To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com/blog/part1-rabbitmq-for-beginners-what-is-rabbitmq.html) article by Lovisa Johansson who does a great job explaining the core concepts and usages of rabbitMQ.
 
-The workflow begins with frontend server creating a request using rabbitmq client class, this makes the frontend-server the producer. 
+## Workflow
 
-* request
-	- declares a temp queue which the response will be sent to
+<image src="./Setup/docs/images/lamp_stack.png" height=40% width=80%>
+
+The request's workflow begins with frontend-server creating a request using rabbitmq's Client class. At this part of the workflow the frontend-server is the producer. 
+
+* frontend-server
+	- frontend-server declares a temp queue which the rabbitmq/backend-server will send their response to
 		- `{queue-name}-response` 
-	- request sent to exchange with routing_key
+	- frontend-server sends request to exchange with routing_key
 		- `data.rabbitmq`
 		- `data.backend`
 	- routing key determines which queue the request is sent to
 	
-rabbitmq server and backend server are both listening to their respected queues for any incoming requests. Requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq` and similarly requests sent with routing_key `data.backend` gets sent to the queue `data-backend`.
+* rabbitmq-server and backend-server 
+	- both servers are listening to their respected queues for any incoming requests. 
+	- requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq`
+	- requests sent with routing_key `data.backend` gets sent to the queue `data-backend`
 
-The servers pull the requests, process them, and send the response back on the reply-queue that was sent as a parameter of the request. Once frontend server consumes the response from reply queue, the reply queue auto_deletes and the 2 way communication completes here.
+Once the servers detect an incoming request in their queue, they pull the request, process them, and send the response back on the reply-queue that was sent as a parameter of the request. After frontend-server consumes the response from reply-queue, the reply-queue auto_deletes and the 2 way communication completes here.
 
-<image src="./Setup/docs/images/lamp_stack.png" height=40% width=80%>
+# Choosing between 3 VM or 4 VM Setup
+There are 2 approaches for this project.
 
-# VM's
-We will be using 3 Virtual Machines running on Ubuntu 22.04 LTS.
+* Option 1: Manually configure each of the 3 servers (frontend-server, rabbitmq-server, backend-server)
+	- this approach only requires 3 VM's, 1 for each server.
+* Option 2: Using Ansible to configure the 3 servers
+	- this approach requires 4 VM's: 3 VM's for each server + 1 VM for Ansible
+	- you might be able to keep it a 3 VM setup by hosting Ansible on the rabbitmq-server but that approach was not explored or tested here
+
+We will choose Option 2 for the added simplicity that Ansible provides with managing and configuring servers and also for gaining that experience of using Ansible. If you choose to go with Option 1, you may follow [this](./Setup/README.md) guide that walks through the process for the 3 VM setup.
+
+# VM's for a 4 VM setup
+We will be using 4 Virtual Machines running on Ubuntu 22.04 LTS.
 
 1. Front end Apache Web server
 2. RabbitMQ message broker server
 3. Back end Mysql Database server
+4. Ansible
 
 # Setup
-## Creating VMs
+Here are the steps that need to be taken to create the infrastructure before we can use Ansible to configure the server's.
+
+1. Create each of the 4 VM's manually
+2. From the UTM Portal, each VM's Network Mode to Bridged
+3. On each VM, manually download `openssh-server`
+4. On each VM, manually set static IP's
+	- Done inx [step 4](#setup-step-4-|-set-static-ip's)
+5. On each VM, create a new user called `automation-user` and setup password-less sudo permissions for that user
+	- you can use the script [create_user.sh](./Setup/create_user.sh) which creates the user and sets the password-less sudo permission for it
+6. On the Ansible VM, create a ssh-key
+	- command: `ssh-keygen -t rsa -b 4096`
+	- Hit enter at all prompts to keep default settings
+7. On the Ansible VM, copy the ssh public key to all VM's, including the ansible VM itself.
+	- command: `ssh-copy-id automation-user@<VM_IP_ADDRESS>`
+	
+## Setup Step 1 | Creating VMs
 VM creation portion is the same for any setup. The configuration portion varies. 
 
-* Create 3 VM's using Ubuntu 22.04.2 LTS iSO
+* Create 4 VM's using Ubuntu 22.04.2 LTS iSO
 	- Memory: 3072 MB
 	- Cores: 2
 	- Storage: >= 25 GB
+* For the Ansible VM, you can choose to downgrade the Memory to 2048 MB and storage to 20 GB since it will only be hosting Ansible which doesn't require alot of resources.
+
 > For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64. [Here](./Setup/docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
 
-* It is helpful if you set static IP's for the VM's at this point.
-	- Follow [these](#setting-static-ip-on-vm) steps to set static IP's on your VM's
+## Setup Step 2 | VM Network Mode: Bridged
 
-### Step 1
-Use VM1 to configure frontend-server. The web application will be hosted on this VM and it will utilize rabbitmq client to send requests. rabbitmq client will send requests over the exchange with 1 of 2 routing key's. Each routing key points to its own Queue. Each of the 2 Queues are listened to from VM2 and VM3, respectively. 
+<image src="Setup/docs/images/8_edit_vm_settings.png" height="60%" width="20%">
 
-* Download git
-	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide 
-	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
-* Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
-* Download server dependencies using [frontend_requirements.txt](./Setup/frontend_requirements.txt)
-	- `xargs -a frontend_requirements.txt sudo apt-get install -y`
-* Set the `BROKER_HOST` values for both servers in [rabbitmq.ini](./frontend-server/rabbitmq/rabbitmq.ini) to VM2's (rabbitmq-server) IP Address.
-* Now copy all the contents of [frontend-server](./frontend-server) into `var/www/html/`.
-* restart apache2
-	- `sudo systemctl restart apache2.service`
+<image src="Setup/docs/images/9_change_network_mode.png" height="40%" width="60%">
 
-### Step 2
-Use VM2 to configure rabbitmq-server. The rabbitmq service will be running on this VM. All RabbitMQ users, exchanges and queues will be created from this VM. We will run a rabbitmqServer.php script in this VM which listens for messages in the Queue `data-rabbitmq`. Requests recieved will be processed locally and then a response will be sent back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
+## Setup Step 3 | Download openssh-server
+After each VM is created, we can download `openssh-server` by running the following command, `sudo apt-get update && sudo apt-get install openssh-server -y`.
 
-* Download git
-	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide 
-	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
-* Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
-* Download server dependencies using [rabbitmq_requirements.txt](./Setup/rabbitmq_requirements.txt)
-	- `xargs -a rabbitmq_requirements.txt sudo apt-get install -y`
-* Configure the rabbitmq server by running script [rabbitmq-config.sh](./Setup/rabbitmq-config.sh) as root:
-	- Creates vhost
-	- Creates new rabbitmq admin user
-	- Creates Exchange, Queues and bind them
-* Lets create a systemd service for [rabbitmqServer.php](./rabbitmq-server/rabbitmqServer.php) from the [rabbitmq-server](./rabbitmq-server) directory so rabbitmq service listens into the queue at start up.
-	- Run the script as root [rabbitmq-server-rmq-service.sh](./Setup/rabbitmq-server-rmq-service.sh)
-
-### Step 3 
-Use VM3 to configure backend-server. This VM hosts the database. We will create the database, database user, and tables. We will also run a rabbitmqServer.php on this VM which listens to the Queue `data-backend`. Requests recieved will be processed by performing queries on database and then a response will be send back to VM 1 via a reply queue that VM 1 declared at the time of sending request.
-
-* Download git
-	- `sudo apt-get update && sudo apt-get install git`
-* Configure Git using [this](./Setup/docs/github_setup.md) guide 
-	- or update the variables and run the script [git-config.sh](./Setup/git-config.sh).
-* Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
-* Download server dependencies using [backend_requirements.txt](./Setup/backend_requirements.txt)
-	- `xargs -a backend_requirements.txt sudo apt-get install -y`
-* Set the `BROKER_HOST` value in [rabbitmq.ini](./backend-server/rabbitmq.ini) to VM2's (rabbitmq-server) IP Address.
-* Now, configure mysql database by running script [mysql-config.sh](./Setup/mysql-config.sh) as root:
-	- Creates `dev_db` database
-	- Creates new mysql admin user
-		- permissions to dev_db via localhost
-	- Creates `Users` table
-* Lets create a systemd service for [rabbitmqServer.php](./backend-server/rabbitmqServer.php) from the [backend-server](./backend-server) directory so rabbitmq service listens into the queue at start up.
-	- Run the script as root [backend-server-rmq-service.sh](./Setup/backend-server-rmq-service.sh)
-
-# Setting static IP on VM
-
-Its useful to set static IP's for these VM's, helps remember the IP's. Log into each VM and repeat these steps.
+## Setup Step 4 | Set static IP's
+Set static IP's for each VM by following the steps below.
 
 1. Click network settings and choose the current network
 
@@ -104,9 +92,93 @@ Its useful to set static IP's for these VM's, helps remember the IP's. Log into 
 
 3. Navigate to the IPv4 section & choose the manual option
 4. Fill out the fields shown in the picture, choose ip's that are easy to remember.
+
+* Addresses for each VM:
 	- frontend-server: `10.0.0.10`
 	- rabbitmq-server: `10.0.0.11`
 	- backend-server: `10.0.0.12`
+	- apache: `10.0.0.13`
+* Netmask
+	- `255.255.255.0`
+* Gateway
+	- `10.0.0.1`
+* DNS
+	- `75.75.75.75, 75.75.76.76`
 
 <image src="Setup/docs/images/20_manual_network_settings.png" height="60%" width="40%">
 
+## Setup Step 5 | Creating new user
+Same steps as mentioned above, under the (Setup)[#setup] section.
+
+On each VM:
+* use the script [create_user.sh](./Setup/create_user.sh) which creates the user `automation-user` and sets the password-less sudo permission for it
+	- we are creating a new user because we want to avoid changing the default user's permission to password-less sudo access.
+	
+## Setup Step 6 | Creating ssh-key in Ansible VM
+Same steps as mentioned above, under the (Setup)[#setup] section.
+
+From the Ansible VM:
+* create ssh-key
+	- command: `ssh-keygen -t rsa -b 4096`
+	- Hit enter at all prompts to keep default settings
+
+## Setup Step 7 | Copying public-ssh-key from Ansible VM
+Same steps as mentioned above, under the (Setup)[#setup] section.
+
+From the Ansible VM:
+* copy the ssh public key to all VM's, including the ansible VM itself.
+	- command: `ssh-copy-id automation-user@<VM_IP_ADDRESS>`
+	- note that this has to be done after the `automation-user` is created (setup step 4)
+
+# Ansible playbook 
+This concludes the Setup phase. Now we can run the Ansible playbook to configure all the servers. The playbook downloads server dependencies on each VM based on the group the VM is listed under in inventory.ini. We utilize Ansible Roles to configure the servers. Roles are a way to organize and structure your Ansible code to make it more modular, reusable, and maintainable. 
+
+* To run the playbook:
+	- navigate to ~/Github/lamp-stack/ansible/
+	- command: `ansible-playbook -i inventory.ini configure_servers.yml` 
+
+## Ansible Roles
+* base - runs on all 4 VM's
+	- configures git
+	- creates dir `~/Github` and inside it, clones the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
+* frontend - runs on all VM's under the frontend_server group in inventory.ini
+	- does a git pull to update the repo ~/Github/lamp-stack
+	- deletes all content from /var/www/html/
+	- copies all content from `~/Github/lamp-stack/frontend-server/` to `/var/www/html/`
+	- restarts apache webserver
+* rabbitmq - runs on all VM's under the rabbitmq_server group in inventory.ini
+	- enables rabbitmq-management
+	- creates vhost, rabbitmq admin user, exchange, queues, bindings
+	- creates rabbitmq consumer service for rabbitmq-server listening on queue `data-rabbitmq`
+		- `rabbitmq-server/rabbitmqServer.php` into a systemd service
+* backend - runs on all VM's under the backend_server group in inventory.ini
+	- creates mysql database
+	- creates mysql admin user with permissions to new database from localhost
+	- creates table
+	- creates rabbitmq consumer service for backend-server listening on queue `data-backend`
+		- `backend-server/rabbitmqServer.php` into a systemd service
+		
+# Good to Know
+
+## frontend-server
+* restart apache
+	- in the frontend-server: `sudo systemctl restart apache2.service`
+
+## rabbitmq-server
+* To get the logs for rabbitmq-service.service
+	- in rabbitmq-server: `journalctl -u rabbitmq-service.service`
+* To check the status of rabbitmq-service.service
+	- in backend-server: `sudo systemctl status rabbitmq-service.service`
+* To remove rabbitmq-server's rabbitmq consumer service
+	- run the script [delete_rabbitmq_rmq_consumer_service.sh](./Setup/docs/delete_rabbitmq_rmq_consumer_service.sh)
+	
+## backend-server
+* To get the logs for backend-service.service
+	- in backend-server: `journalctl -u backend-service.service`
+* To check the status of backend-service.service
+	- in backend-server: `sudo systemctl status backend-service.service`
+* To remove backend-server's rabbitmq consumer service
+	- run the script [delete_backend_rmq_consumer_service.sh](./Setup/docs/delete_backend_rmq_consumer_service.sh)
+* To remove mysql-server from backend-server
+	- run the script [delete_mysql_completely.sh](./Setup/docs/delete_mysql_completely.sh)
+	
