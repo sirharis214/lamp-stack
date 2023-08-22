@@ -1,8 +1,8 @@
 #!/bin/bash
 
 root_file="/lib/systemd/system"
-service_name="rabbitmq-service.service"
-server_file="/home/haris/Github/lamp-stack/rabbitmq-server/rabbitmqServer.php"
+service_name="backend-service.service"
+server_file="$HOME/Github/lamp-stack/backend-server/rabbitmqServer.php"
 
 # Function to get the terminal width
 get_terminal_width() {
@@ -29,7 +29,7 @@ RESET="\033[0m"
 
 # Function to display a green-colored message
 welcome_message() {
-  local welcome="LampStack | Rabbitmq Server | RabbitMQ Consumer Service"
+  local welcome="LampStack | Backend Server | RabbitMQ Consumer Service"
   echo -e "${GREEN}$(centered_message "$welcome")${RESET}"
 }
 
