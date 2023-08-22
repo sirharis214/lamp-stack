@@ -1,0 +1,53 @@
+- name: RabbitMQ Setup
+  vars:
+    vhost_name: dev
+    user_name: haris
+    user_pass: p
+    prefix: data
+    exchange_name: "{{ prefix }}-exchange"
+    exchange_type: direct
+  block:
+    - name: Enable rabbitmq_management
+      shell: rabbitmq-plugins enable rabbitmq_management
+      become: yes
+      changed_when: false
+
+    - name: Create vHost
+      shell: rabbitmqctl add_vhost {{ vhost_name }}
+      become: yes
+      changed_when: false
+
+    - name: Create RabbitMQ admin user
+      shell: |
+        rabbitmqctl add_user {{ user_name }} {{ user_pass }}
+        rabbitmqctl set_user_tags {{ user_name }} administrator
+        rabbitmqctl set_permissions -p {{ vhost_name }} {{ user_name }} "^{{ prefix }}-.*" "^{{ prefix }}-.*" "^{{ prefix }}-.*"
+      become: yes
+      changed_when: false
+
+    - name: Create Exchange
+      shell: |
+        rabbitmqadmin -u {{ user_name }} -p {{ user_pass }} --vhost={{ vhost_name }} declare exchange name={{ exchange_name }} type={{ exchange_type }}
+      become: yes
+      changed_when: false
+
+    - name: Create RabbitMQ queue
+      shell: |
+        rabbitmqadmin -u {{ user_name }} -p {{ user_pass }} --vhost={{ vhost_name }} declare queue name={{ item.name }} durable=true
+      become: yes
+      changed_when: false
+      loop:
+        - { name: "{{ prefix }}-rabbitmq" }
+        - { name: "{{ prefix }}-backend" }
+
+    - name: Create Exchange to Queue bindings
+      shell: |
+        rabbitmqadmin -u {{ user_name }} -p {{ user_pass }} --vhost={{ vhost_name }} declare binding source={{ exchange_name }} destination_type=queue destination={{ item.queue }} routing_key={{ item.routing_key }}
+      become: yes
+      changed_when: false
+      loop:
+        - { queue: "{{ prefix }}-rabbitmq", routing_key: "{{ prefix }}.rabbitmq" }
+        - { queue: "{{ prefix }}-backend", routing_key: "{{ prefix }}.backend" }
+  tags: rabbitmq_setup
+
+- include_tasks: create_service.yml
