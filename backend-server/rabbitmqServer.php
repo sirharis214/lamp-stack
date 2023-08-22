@@ -139,7 +139,7 @@ function requestProcessor($request){
 		switch($request['type']){
 			case "test":
 				return array("returnCode"=>"0", "message"=>"recieved type:test");
-			case "login":
+			case "login2":
 				return login($request['data']);
 			case "register":
 				return register($request['data']);
@@ -157,4 +157,3 @@ function requestProcessor($request){
 $server = new rabbitmqServer('rabbitmq.ini', 'backend-server');
 $server->process_requests('requestProcessor');
 exit();
-

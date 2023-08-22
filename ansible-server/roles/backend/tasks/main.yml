@@ -1,0 +1,31 @@
+- name: Execute MySQL configuration script on remote machine
+  vars:
+    #script_path: "/home/haris/Github/lamp-stack/Setup/mysql_config.sh"
+    script_path: "/home/haris/mysql_config.sh"
+  block:
+    - name: Check if the script exists
+      stat:
+        path: "{{ script_path }}"
+      register: script_check
+
+    - name: Execute the MySQL configuration script on remote machine
+      command: "{{ script_path }}"
+      args:
+        executable: /bin/bash  # Specify the interpreter for the script
+      register: script_execution_result
+      changed_when: false  # Do not treat script execution as a change
+
+    - name: Display execution status
+      debug:
+        msg: |
+          Execution of MySQL configuration script completed.
+          Exit Status: {{ script_execution_result.rc }}
+          Standard Output:
+          {{ script_execution_result.stdout }}
+          Standard Error:
+          {{ script_execution_result.stderr }}
+  
+  tags: backend
+
+- include_tasks: create_service.yml
+

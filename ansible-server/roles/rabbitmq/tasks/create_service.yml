@@ -1,0 +1,43 @@
+- name: RabbitMQ-Server's Rabbitmq Consumer Service Setup
+  environment:
+    HOME: "/home/haris"
+    USER: "haris"
+  vars:
+    github_dir: "{{ ansible_env.HOME }}/Github/lamp-stack"
+    service_name: "rabbitmq-service"
+  
+  block:
+    - name: Check if {{ service_name }}.service already exists
+      stat:
+        path: "/lib/systemd/system/{{ service_name }}.service"
+      register: systemd_service_stat
+
+    - name: Set the path to rabbitmqServer.php and service description and other parameters
+      set_fact:
+        server_file: "{{ github_dir }}/rabbitmq-server/rabbitmqServer.php"
+        service_description: "{{ service_name }}.service"
+        queue_name: "data-rabbitmq"
+
+    - name: Create rabbitmq-service.service if not exists
+      block:
+        - name: Create systemd service file
+          template:
+            src: rabbitmq.service.j2
+            dest: "/lib/systemd/system/{{ service_name }}.service"
+          become: true
+        - name: Start the rabbitmq-service.service
+          systemd:
+            name: rabbitmq-service.service
+            state: started
+            enabled: yes
+          become: true
+      when: not systemd_service_stat.stat.exists
+
+    - name: Ensure rabbitmq-service.service is started and enabled
+      systemd:
+        name: rabbitmq-service.service
+        state: started
+        enabled: yes
+      when: systemd_service_stat.stat.exists
+      become: true
+
