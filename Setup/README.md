@@ -19,7 +19,7 @@ VM creation portion is the same for any setup. The configuration portion varies.
 	- Storage: >= 25 GB
 > For MacOS M1 chip with VM's running on UTM: use jammy-desktop-arm64. [Here](./docs/creating_VMs.md) is a in-dept guide of creating these VM's on UTM.
 
-* It is helpful if you set static IP's for the VM's at this point.
+* It is best if you set static IP's for the VM's at this point.
 	- Follow [these](#setting-static-ip-on-vm) steps to set static IP's on your VM's
 
 ### Step 1
@@ -28,7 +28,7 @@ Use VM1 to configure frontend-server which will host the apache web server. The 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
 * Configure git using 1 of the 2 methods 
-	- run the script [git-config.sh](./git-config.sh) by first updating the variables 
+	- run the script [git_config.sh](./git_config.sh) by first updating the variables 
 	- manually approach, follow [this](./docs/github_setup.md) guide
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [frontend_requirements.txt](./frontend/frontend_requirements.txt)
@@ -44,7 +44,7 @@ Use VM2 to configure rabbitmq-server. All RabbitMQ users, exchanges and queues w
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
 * Configure git using 1 of the 2 methods 
-	- run the script [git-config.sh](./git-config.sh) by first updating the variables 
+	- run the script [git_config.sh](./git_config.sh) by first updating the variables 
 	- manually approach, follow [this](./docs/github_setup.md) guide
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [rabbitmq_requirements.txt](./rabbitmq/rabbitmq_requirements.txt)
@@ -62,7 +62,7 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 * Download git
 	- `sudo apt-get update && sudo apt-get install git`
 * Configure git using 1 of the 2 methods 
-	- run the script [git-config.sh](./git-config.sh) by first updating the variables 
+	- run the script [git_config.sh](./git_config.sh) by first updating the variables 
 	- manually approach, follow [this](./docs/github_setup.md) guide
 * Clone the repo [lamp-stack](https://github.com/sirharis214/lamp-stack.git)
 * Download server dependencies using [backend_requirements.txt](./backend/backend_requirements.txt)
@@ -78,18 +78,26 @@ Use VM3 to configure backend-server. This VM hosts the database. We will create 
 
 # Setting static IP on VM
 
-Its useful to set static IP's for these VM's, removes the need to manually update the rabbitmq.ini file in the event the rabbitmq-server restarts, also helps remember the IP's of each server. Log into each VM and repeat these steps.
+Set static IP's for these VM's by first changing the VM network mode to Bridged, then repeat these steps in each VM.
 
-1. Click network settings and choose the current network
+1. Click "Edit" on the VM in the UTM portal
+
+<image src="./docs/images/8_edit_vm_settings.png" height="60%" width="20%">
+
+2. Go to Network settings and change the Network Mode to "Bridged"
+
+<image src="./docs/images/9_change_network_mode.png" height="40%" width="60%">
+
+3. Inside the VM, Click network settings and choose the current network
 
 <image src="./docs/images/18_wired_settings.png" height="60%" width="40%">
 	
-2. Jot the DNS from the Details section.
+4. Jot the DNS from the Details section.
 
 <image src="./docs/images/19_dns.png" height="20%" width="60%">
 
-3. Navigate to the IPv4 section & choose the manual option
-4. Fill out the fields shown in the picture, choose ip's that are easy to remember.
+5. Navigate to the IPv4 section & choose the manual option
+6. Fill out the fields shown in the picture, choose ip's that are easy to remember.
 	- frontend-server: `10.0.0.10`
 	- rabbitmq-server: `10.0.0.11`
 	- backend-server: `10.0.0.12`

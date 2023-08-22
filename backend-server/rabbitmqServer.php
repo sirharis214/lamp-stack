@@ -139,8 +139,8 @@ function requestProcessor($request){
 		switch($request['type']){
 			case "test":
 				return array("returnCode"=>"0", "message"=>"recieved type:test");
-			case "login":
-				return login2($request['data']);
+			case "login2":
+				return login($request['data']);
 			case "register":
 				return register($request['data']);
 			case "get_all_users_data":

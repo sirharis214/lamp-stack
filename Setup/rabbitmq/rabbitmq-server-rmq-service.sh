@@ -2,7 +2,7 @@
 
 root_file="/lib/systemd/system"
 service_name="rabbitmq-service.service"
-server_file="/home/haris/Github/lamp-stack/rabbitmq-server/rabbitmqServer.php"
+server_file="$HOME/Github/lamp-stack/rabbitmq-server/rabbitmqServer.php"
 
 # Function to get the terminal width
 get_terminal_width() {
