@@ -9,20 +9,21 @@ To learn more about rabbitMQ, I suggest reading [this](https://www.cloudamqp.com
 
 The request's workflow begins with frontend-server creating a request using rabbitmq's Client class. At this part of the workflow the frontend-server is the producer. 
 
-* frontend-server
-	- frontend-server declares a temp queue which the rabbitmq/backend-server will send their response to
+1. frontend-server
+	* frontend-server declares a temp reply-queue which the rabbitmq/backend-server will send their response to
 		- `{queue-name}-response` 
-	- frontend-server sends request to exchange with routing_key
+	* frontend-server sends request to exchange with routing_key:
 		- `data.rabbitmq`
 		- `data.backend`
-	- routing key determines which queue the request is sent to
-	
-* rabbitmq-server and backend-server 
-	- both servers are listening to their respected queues for any incoming requests. 
-	- requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq`
-	- requests sent with routing_key `data.backend` gets sent to the queue `data-backend`
-
-Once the servers detect an incoming request in their queue, they pull the request, process them, and send the response back on the reply-queue that was sent as a parameter of the request. After frontend-server consumes the response from reply-queue, the reply-queue auto_deletes and the 2 way communication completes here.
+2. rabbitmq-server
+    * in rabbitmq exchange, the routing_key determines which queue the request is sent to
+        - requests sent with routing_key `data.rabbitmq` gets sent to the queue `data-rabbitmq`
+	    - requests sent with routing_key `data.backend` gets sent to the queue `data-backend`  	
+3. rabbitmq-server and backend-server 
+	* both servers are listening to their respected queues for any incoming requests
+    * once they recieve a request, they process and return a response to the temp reply-queue `{queue-name}-response` 
+        - the name of the reply-queue is sent as a parameter of the request thats being recieved
+4. after frontend-server consumes the response from reply-queue, the reply-queue auto_deletes and the 2 way communication completes here
 
 # Choosing between 3 VM or 4 VM Setup
 There are 2 approaches for this project.
@@ -38,24 +39,29 @@ We will choose Option 2 for the added simplicity that Ansible provides with mana
 # VM's for a 4 VM setup
 We will be using 4 Virtual Machines running on Ubuntu 22.04 LTS.
 
-1. Front end Apache Web server
+1. Frontend Apache Web server
+    * static ip: `10.0.0.10`
 2. RabbitMQ message broker server
-3. Back end Mysql Database server
+    * static ip: `10.0.0.11`
+3. Backend Mysql Database server
+    * static ip: `10.0.0.12`
 4. Ansible
+    * static ip: `10.0.0.13`
 
 # Setup
 Here are the steps that need to be taken to create the infrastructure before we can use Ansible to configure the server's.
 
 1. Create each of the 4 VM's manually
-2. From the UTM Portal, each VM's Network Mode to Bridged
+    - done in [step 1](#setup-step-1--creating-vms)
+2. From the UTM Portal, change each VM's Network Mode to Bridged
 3. On each VM, manually download `openssh-server`
 4. On each VM, manually set static IP's
-	- Done inx [step 4](#setup-step-4-|-set-static-ip's)
+	- done in [step 4](#setup-step-4--set-static-ips)
 5. On each VM, create a new user called `automation-user` and setup password-less sudo permissions for that user
 	- you can use the script [create_user.sh](./Setup/create_user.sh) which creates the user and sets the password-less sudo permission for it
 6. On the Ansible VM, create a ssh-key
 	- command: `ssh-keygen -t rsa -b 4096`
-	- Hit enter at all prompts to keep default settings
+	- hit enter at all prompts to keep default settings
 7. On the Ansible VM, copy the ssh public key to all VM's, including the ansible VM itself.
 	- command: `ssh-copy-id automation-user@<VM_IP_ADDRESS>`
 	
@@ -77,7 +83,8 @@ VM creation portion is the same for any setup. The configuration portion varies.
 <image src="Setup/docs/images/9_change_network_mode.png" height="40%" width="60%">
 
 ## Setup Step 3 | Download openssh-server
-After each VM is created, we can download `openssh-server` by running the following command, `sudo apt-get update && sudo apt-get install openssh-server -y`.
+* After each VM is created, we can download `openssh-server` by running the following command 
+    - `sudo apt-get update && sudo apt-get install openssh-server -y`.
 
 ## Setup Step 4 | Set static IP's
 Set static IP's for each VM by following the steps below.
@@ -108,23 +115,17 @@ Set static IP's for each VM by following the steps below.
 <image src="Setup/docs/images/20_manual_network_settings.png" height="60%" width="40%">
 
 ## Setup Step 5 | Creating new user
-Same steps as mentioned above, under the (Setup)[#setup] section.
-
 On each VM:
 * use the script [create_user.sh](./Setup/create_user.sh) which creates the user `automation-user` and sets the password-less sudo permission for it
 	- we are creating a new user because we want to avoid changing the default user's permission to password-less sudo access.
 	
 ## Setup Step 6 | Creating ssh-key in Ansible VM
-Same steps as mentioned above, under the (Setup)[#setup] section.
-
 From the Ansible VM:
 * create ssh-key
 	- command: `ssh-keygen -t rsa -b 4096`
 	- Hit enter at all prompts to keep default settings
 
 ## Setup Step 7 | Copying public-ssh-key from Ansible VM
-Same steps as mentioned above, under the (Setup)[#setup] section.
-
 From the Ansible VM:
 * copy the ssh public key to all VM's, including the ansible VM itself.
 	- command: `ssh-copy-id automation-user@<VM_IP_ADDRESS>`
